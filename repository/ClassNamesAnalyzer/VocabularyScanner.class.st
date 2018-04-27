@@ -54,7 +54,7 @@ VocabularyScanner >> generateaClassNamesScanReport [
 	subEntityScanReports := self subEntities collect: #scanClassNames.
 	classNamesScanReport subEntityScanReports: subEntityScanReports.
 	self definedMetrics associations do:[:each| 
-		classNamesScanReport at: each key put: (each value value: (subEntityScanReports))".self halt"].
+		classNamesScanReport at: each key ifAbsentPut: (each value value: (subEntityScanReports))].
 	^classNamesScanReport.
 
 ]
