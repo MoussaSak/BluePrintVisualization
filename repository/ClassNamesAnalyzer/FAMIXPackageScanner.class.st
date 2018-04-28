@@ -72,7 +72,7 @@ FAMIXPackageScanner >> defaultMetrics [
 				collect: #value ];
 		at: 'allRootClasses'
 			put:
-				[ :aSingleClassScanReports | aSingleClassScanReports collect: [ :aSingleClassScanReport | (aSingleClassScanReport at: 'rootClass')->(aSingleClassScanReport at: 'scannedClasses') ] ];
+				[ :aSingleClassScanReports | aSingleClassScanReports collect: [ :aSingleClassScanReport | (aSingleClassScanReport at: 'rootClass')->(aSingleClassScanReport) ] ];
 		at: 'allRootClassesAsaSet'
 			put: [ :aSingleClassScanReports | 
 			(self classNamesScanReport
