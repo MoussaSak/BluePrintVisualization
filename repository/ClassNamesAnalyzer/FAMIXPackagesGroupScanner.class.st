@@ -17,7 +17,23 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 		at: 'classNames' put: [ :aGroupOfScanReports | aGroupOfScanReports flatCollect: [ :aPackageScanReport| aPackageScanReport at: 'classNames']];
 		at: 'allRootClasses' put: [ :aGroupOfScanReports | aGroupOfScanReports flatCollect: [ :aPackageScanReport| aPackageScanReport at: 'allRootClasses']];
 		
-		at: 'hierarchiesGroupedBySuffixes' put: [ :aGroupOfScanReports | aGroupOfScanReports flatCollect: [ :aPackageScanReport| aPackageScanReport at: 'allRootClasses']];
+		at: 'hierarchiesGroupedBySuffixes' put: [ :aGroupOfScanReports | 
+			|aDictionary|
+			aDictionary := Dictionary new.
+(self classNamesScanReport at: 'allRootClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClasses') value: aGroupOfScanReports]) collect: [:association|
+	|suffix rootClass|
+	suffix := association value at: 'classSuffix'.
+	rootClass := association key.
+	aDictionary at: suffix ifPresent: [(aDictionary at: suffix) add: rootClass ] ifAbsentPut: [Set with: rootClass] ].
+	aDictionary];
+
+		at: 'suffixesGroupedByRootClasses' put: [ :aGroupOfScanReports | 
+			|aDictionary|
+			aDictionary := Dictionary new.
+(self classNamesScanReport at: 'allClassesGroupedByRootClasses' ifAbsentPut: [(self defaultMetrics at:'allClassesGroupedByRootClasses') value: aGroupOfScanReports]) associations collect: [:association|
+	association key -> (association value collect: [:aReport| aReport at: 'classSuffix'])
+	]];
+		
 		
 		at: 'allClassesGroupedByRootClasses' put: [ :aGroupOfScanReports | 
 			|aDictionary|
@@ -26,7 +42,8 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 				|root subClass|
 				root := anAssociation key.
 				subClass := anAssociation value.
-				aDictionary at: root ifPresent: [ aDictionary at: root put: ((aDictionary at: root) add: subClass;yourself) ] ifAbsentPut: [ Bag with: subClass ]
+				aDictionary at: root ifPresent: [ (aDictionary at: root) add: subClass;yourself ] ifAbsentPut: [ Bag with: subClass ]
+			
 				].
 			aDictionary];
 		
