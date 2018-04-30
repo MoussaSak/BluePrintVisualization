@@ -8,6 +8,11 @@ Class {
 }
 
 { #category : #accessing }
+VocabularyScanReport >> subEntityScanReports [
+	^ subEntityScanReports
+]
+
+{ #category : #accessing }
 VocabularyScanReport >> subEntityScanReports: aMooseGroup [ 
 	subEntityScanReports := aMooseGroup
 ]

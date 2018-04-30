@@ -13,6 +13,7 @@ FAMIXPackageScanner class >> reportClass [
 FAMIXPackageScanner >> defaultMetrics [
 	^ Dictionary new
 		at: 'numberOfPackages' put: [ :argh | 1 ];
+		at: 'packageName' put: [ :argh | self scannedPackage name ];
 		at: 'allClasses' put: [ :aSingleClassScanReports | aSingleClassScanReports collect: #scannedClass ];
 		at: 'classNames'
 			put:
@@ -20,7 +21,7 @@ FAMIXPackageScanner >> defaultMetrics [
 		at: 'classesAndSuffixes'
 			put: [ :aSingleClassScanReports | 
 			aSingleClassScanReports
-				collect: [ :aSingleClassScanReport | (aSingleClassScanReport scannedClass) -> (aSingleClassScanReport at: 'classSuffix') ] ];
+				collect: [ :aSingleClassScanReport | (aSingleClassScanReport "scannedClass") -> (aSingleClassScanReport at: 'classSuffix') ] ];
 			
 		at: 'rootClassesGroupedBySuffixes'
 			put: [ :aSingleClassScanReports | 
@@ -29,7 +30,7 @@ FAMIXPackageScanner >> defaultMetrics [
 			classesGroupedBySuffixes := self classNamesScanReport
 				at: 'classesGroupedBySuffixes'
 				ifAbsentPut: [ (self defaultMetrics at: 'classesGroupedBySuffixes') value: aSingleClassScanReports ].
-			classesGroupedBySuffixes associations collect: [:anAssociation| (anAssociation key -> (anAssociation value collect: #rootClass))]
+			classesGroupedBySuffixes associations collect: [:anAssociation| (anAssociation key -> (anAssociation value collect: [:each|each at:'rootClass']))]
 				  ]	;
 			
 		at: 'classesGroupedBySuffixes'
