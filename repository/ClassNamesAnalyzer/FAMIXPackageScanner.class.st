@@ -15,6 +15,10 @@ FAMIXPackageScanner >> defaultMetrics [
 		at: 'numberOfPackages' put: [ :argh | 1 ];
 		at: 'packageName' put: [ :argh | self scannedPackage name ];
 		at: 'allClasses' put: [ :aSingleClassScanReports | aSingleClassScanReports collect: #scannedClass ];
+		at: 'dominantRootsInSuffix' put: [ :aGroupOfScanReports | 
+			((self classNamesScanReport at: 'rootClassesGroupedBySuffixes' ifAbsentPut: [(self defaultMetrics at:'rootClassesGroupedBySuffixes') value: aGroupOfScanReports]) collect: [:association|association key -> association value sortedCounts])asDictionary];
+		at: 'colorsOfRootClasses' put: [ :aSingleClassScanReports | self scannedPackage mooseModel dictionaryOfRootClassColors ];
+		at: 'allRootClassesSortedByNumberOfSubClasses' put: [ :aGroupOfScanReports | ((self classNamesScanReport at: 'allRootClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClasses') value: aGroupOfScanReports]) collect:#key) asBag sortedCounts];
 		at: 'classNames'
 			put:
 				[ :aSingleClassScanReports | aSingleClassScanReports collect: [ :aSingleClassScanReport | aSingleClassScanReport at: 'className' ] ];
@@ -90,6 +94,11 @@ FAMIXPackageScanner >> scannedPackage [
 { #category : #accessing }
 FAMIXPackageScanner >> scannedPackage: aFAMIXPackage [ 
 	self scannedEntities: aFAMIXPackage
+]
+
+{ #category : #accessing }
+FAMIXPackageScanner >> scannedPackages [
+	^{self scannedPackage}.
 ]
 
 { #category : #accessing }

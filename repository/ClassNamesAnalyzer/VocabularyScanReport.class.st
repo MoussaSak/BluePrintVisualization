@@ -2,10 +2,21 @@ Class {
 	#name : #VocabularyScanReport,
 	#superclass : #Dictionary,
 	#instVars : [
-		'subEntityScanReports'
+		'subEntityScanReports',
+		'scannedEntity'
 	],
 	#category : #'ClassNamesAnalyzer-Reports'
 }
+
+{ #category : #accessing }
+VocabularyScanReport >> scannedEntity [
+	^ scannedEntity
+]
+
+{ #category : #accessing }
+VocabularyScanReport >> scannedEntity: aFAMIXPackageGroup [ 
+	scannedEntity := aFAMIXPackageGroup
+]
 
 { #category : #accessing }
 VocabularyScanReport >> subEntityScanReports [
