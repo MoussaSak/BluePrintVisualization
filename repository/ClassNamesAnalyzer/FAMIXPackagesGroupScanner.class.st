@@ -45,11 +45,12 @@ forEach:[:suffix|
 					borderColor:[: aClassScanReport | (aClassScanReport at: 'className') = (aClassScanReport at: 'rootClass') ifTrue:[Color black] ifFalse:[(dictionaryOfColors at: (aClassScanReport at: 'rootClass')) adjustBrightness: -0.1]];
 					borderWidth: 1.
 					b nodes: ((aSinglePackageScanReport at: 'classesGroupedBySuffixes') at: suffix value).
-					
 					b layout grid.
 					].	
+				b layout grid.
 		"self halt."
 ].
+b layout grid.
 ^b
 ]
 
