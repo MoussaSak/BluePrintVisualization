@@ -26,3 +26,8 @@ FAMIXClass >> superclasses [
 		ifTrue:[ ^ OrderedCollection with: self ]
 		ifFalse: [ ^self superclass superclasses add: self;yourself ]
 ]
+
+{ #category : #'*ClassNamesAnalyzer' }
+FAMIXClass >> vocabularyScanner: aFAMIXClassScanner [ 
+	vocabularyScanner := aFAMIXClassScanner
+]
