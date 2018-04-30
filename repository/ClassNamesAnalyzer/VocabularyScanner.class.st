@@ -21,13 +21,51 @@ VocabularyScanner class >> reportClass [
 
 { #category : #'instance-creation' }
 VocabularyScanner class >> scan: aFAMIXPackageGroup [ 
-	^(self new scannedEntities: aFAMIXPackageGroup) generateaClassNamesScanReport.
+	|aVocabularyScanner|
+	aVocabularyScanner := (self new scannedEntities: aFAMIXPackageGroup) generateaClassNamesScanReport;yourself.
+	aFAMIXPackageGroup vocabularyScanner: aVocabularyScanner.
+	^aVocabularyScanner
 ]
 
 { #category : #metrics }
 VocabularyScanner >> addaMetric: metricName with: aBlock [
 	definedMetrics at: metricName put: aBlock
 	
+]
+
+{ #category : #Visualizations }
+VocabularyScanner >> classBluePrint [
+		| b sortedRootClasses dictionaryOfColors|
+	^classNamesScanReport at: 'classBlueprint' ifAbsentPut:[
+	b := RTMondrian new.
+		sortedRootClasses := (self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses') collect: #value.
+		dictionaryOfColors := self classNamesScanReport at: 'colorsOfRootClasses'.
+		b shape rectangle withTextAbove.
+	b
+		nodes: (self scannedPackages)
+		forEach: [ :aSinglePackage |
+			|aSinglePackageScanReport|
+			aSinglePackageScanReport := aSinglePackage vocabularyScanner classNamesScanReport.
+		b shape rectangle.
+		b shape color: [:aSuffix| |dominantClasse| 
+			dominantClasse := ((self classNamesScanReport at: 'dominantRootsInSuffix')at: aSuffix value) first value.
+			self dictionaryOfColors at: dominantClasse];
+		"size: [ :suffix | suffix key ];"withTextAbove: #value.
+b nodes: (aSinglePackageScanReport at: 'allClassNameSuffixesSorted')
+forEach:[:suffix|
+					b shape rectangle.
+					b shape color: [:aClassScanReport| ((aClassScanReport at: 'className') = 'Object') ifTrue:[Color black] ifFalse:[self dictionaryOfColors at: (aClassScanReport at: 'rootClass')  ]];
+					borderColor:[: aClassScanReport | (aClassScanReport at: 'className') = (aClassScanReport at: 'rootClass') ifTrue:[Color black] ifFalse:[(self dictionaryOfColors at: (aClassScanReport at: 'rootClass')) adjustBrightness: -0.1]];
+					borderWidth: 1.
+					b nodes: ((aSinglePackageScanReport at: 'classesGroupedBySuffixes') at: suffix value).
+					b layout grid.
+					].	
+				b layout grid.
+		"self halt."
+].
+b layout grid.
+"classNamesScanReport at: 'classBlueprint' put: [ :aGroupOfScanReports | b]."
+b]
 ]
 
 { #category : #Accessing }
@@ -47,11 +85,17 @@ VocabularyScanner >> definedMetrics [
 	
 ]
 
+{ #category : #'instance-creation' }
+VocabularyScanner >> dictionaryOfColors [
+	^self scannedEntities mooseModel dictionaryOfRootClassColors
+]
+
 { #category : #VocabularyScanning }
 VocabularyScanner >> generateaClassNamesScanReport [
 	| subEntityScanReports |
 	classNamesScanReport := self reportClass new.
-	subEntityScanReports := self subEntities collect: #scanClassNames.
+	classNamesScanReport scannedEntity: scannedEntities.
+	subEntityScanReports := (self subEntities collect: #scanClassNames) collect: #classNamesScanReport.
 	classNamesScanReport subEntityScanReports: subEntityScanReports.
 	self definedMetrics associations do:[:each| 
 		classNamesScanReport at: each key ifAbsentPut: (each value value: (subEntityScanReports))].

@@ -20,38 +20,8 @@ FAMIXPackagesGroupScanner class >> reportClass [
 
 { #category : #'instance-creation' }
 FAMIXPackagesGroupScanner class >> scan: aFAMIXPackageGroup [ 
-	^(self new scannedEntities: aFAMIXPackageGroup) generateaClassNamesScanReport;yourself.
-]
-
-{ #category : #Visualizations }
-FAMIXPackagesGroupScanner >> classBluePrint [
-		| b visualizationId sortedRootClasses dictionaryOfColors|
-	b := RTMondrian new.
-		sortedRootClasses := (self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses') collect: #value.
-		dictionaryOfColors := self classNamesScanReport at: 'ColorsOfRootClasses'.
-		b shape rectangle withTextAbove: [ :each | each at: 'packageName'].
-	b
-		nodes: self classNamesScanReport singlePackageScanReports
-		forEach: [ :aSinglePackageScanReport |
-		b shape rectangle.
-		b shape color: [:aSuffix| |dominantClasse| 
-			dominantClasse := ((self classNamesScanReport at: 'dominantRootsInSuffix')at: aSuffix value) first value.
-			dictionaryOfColors at: dominantClasse];
-		"size: [ :suffix | suffix key ];"withTextAbove: #value.
-b nodes: (aSinglePackageScanReport at: 'allClassNameSuffixesSorted')
-forEach:[:suffix|
-					b shape rectangle.
-					b shape color: [:aClassScanReport| ((aClassScanReport at: 'className') = 'Object') ifTrue:[Color black] ifFalse:[dictionaryOfColors at: (aClassScanReport at: 'rootClass')  ]];
-					borderColor:[: aClassScanReport | (aClassScanReport at: 'className') = (aClassScanReport at: 'rootClass') ifTrue:[Color black] ifFalse:[(dictionaryOfColors at: (aClassScanReport at: 'rootClass')) adjustBrightness: -0.1]];
-					borderWidth: 1.
-					b nodes: ((aSinglePackageScanReport at: 'classesGroupedBySuffixes') at: suffix value).
-					b layout grid.
-					].	
-				b layout grid.
-		"self halt."
-].
-b layout grid.
-^b
+	"^(self new scannedEntities: aFAMIXPackageGroup) generateaClassNamesScanReport;yourself."
+	^super scan: aFAMIXPackageGroup 
 ]
 
 { #category : #'instance-creation' }
@@ -100,11 +70,11 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 		
 		at: 'allRootClassesAsaSet' put: [ :aGroupOfScanReports | (self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClassesSortedByNumberOfSubClasses') value: aGroupOfScanReports] ) collect: #value ];
 		
-		at: 'ColorsOfRootClasses' put: [ :aGroupOfScanReports | 
+		at: 'colorsOfRootClasses' put: [ :aGroupOfScanReports | 
 			|aDictionaryOfColors i|
 			i := 0.
 			aDictionaryOfColors := Dictionary new.
-			(self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClassesSortedByNumberOfSubClasses') value: aGroupOfScanReports] ) do: [ :aRootClass| i:= i+1. aDictionaryOfColors at: aRootClass value put: (self pickAnAvailableColorNumber: i) ]. aDictionaryOfColors ];
+			(self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClassesSortedByNumberOfSubClasses') value: aGroupOfScanReports] ) do: [ :aRootClass| i:= i+1. aDictionaryOfColors at: aRootClass value put: (self pickAnAvailableColorNumber: i) ]. self saveInMooseModel: aDictionaryOfColors ];
 		
 		yourself
 ]
@@ -128,6 +98,12 @@ FAMIXPackagesGroupScanner >> mergeSinglePackageScanReports: aCollectionOfPackage
 FAMIXPackagesGroupScanner >> pickAnAvailableColorNumber: indexOfColors [
 	indexOfColors < (availableColors size) ifTrue:[^availableColors at: indexOfColors]
 	ifFalse:[ ^Color gray: indexOfColors / (availableColors size) ]
+]
+
+{ #category : #'instance-creation' }
+FAMIXPackagesGroupScanner >> saveInMooseModel: aDictionaryOfColors [
+	self scannedPackages mooseModel dictionaryOfRootClassColors: aDictionaryOfColors.
+	^aDictionaryOfColors
 ]
 
 { #category : #accessing }
