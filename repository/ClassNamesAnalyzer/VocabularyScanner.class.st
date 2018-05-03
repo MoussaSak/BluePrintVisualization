@@ -53,9 +53,10 @@ VocabularyScanner >> classBluePrint [
 		"size: [ :suffix | suffix key ];"withTextAbove: #value.
 b nodes: (aSinglePackageScanReport at: 'allClassNameSuffixesSorted')
 forEach:[:suffix|
+					
 					b shape rectangle.
-					b shape color: [:aClassScanReport| ((aClassScanReport at: 'className') = 'Object') ifTrue:[Color black] ifFalse:[self dictionaryOfColors at: (aClassScanReport at: 'rootClass')  ]];
-					borderColor:[: aClassScanReport | (aClassScanReport at: 'className') = (aClassScanReport at: 'rootClass') ifTrue:[Color black] ifFalse:[(self dictionaryOfColors at: (aClassScanReport at: 'rootClass')) adjustBrightness: -0.1]];
+					b shape color: [:aClassScanReport|((aClassScanReport at: 'className') = 'Object' ) ifTrue:[Color black] ifFalse:[self dictionaryOfColors at: (aClassScanReport at: 'rootClass')  ]];
+					borderColor:[: aClassScanReport | (aClassScanReport at: 'className') = (aClassScanReport at: 'rootClass') name ifTrue:[Color black] ifFalse:[(self dictionaryOfColors at: (aClassScanReport at: 'rootClass')) adjustBrightness: -0.1]];
 					borderWidth: 1.
 					b nodes: ((aSinglePackageScanReport at: 'classesGroupedBySuffixes') at: suffix value).
 					b layout grid.
