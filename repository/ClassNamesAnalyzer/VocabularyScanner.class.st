@@ -36,37 +36,56 @@ VocabularyScanner >> addaMetric: metricName with: aBlock [
 { #category : #Visualizations }
 VocabularyScanner >> classBluePrint [
 		| b sortedRootClasses dictionaryOfColors|
-	^classNamesScanReport at: 'classBlueprint' ifAbsentPut:[
-	b := RTMondrian new.
-		sortedRootClasses := (self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses') collect: #value.
-		dictionaryOfColors := self classNamesScanReport at: 'colorsOfRootClasses'.
-		b shape rectangle withTextAbove.
+	^classNamesScanReport at: 'classBlueprint' ifAbsentPut:[	b := RTMondrian new.
+	sortedRootClasses := (self classNamesScanReport
+		at: 'allRootClassesSortedByNumberOfSubClasses') collect: #value.
+	dictionaryOfColors := self classNamesScanReport
+		at: 'colorsOfRootClasses'.
+	b shape rectangle withTextAbove.
 	b
-		nodes: (self scannedPackages)
-		forEach: [ :aSinglePackage |
-			|aSinglePackageScanReport|
-			aSinglePackageScanReport := aSinglePackage vocabularyScanner classNamesScanReport.
-		b shape rectangle.
-		b shape color: [:aSuffix| |dominantClasse| 
-			dominantClasse := ((self classNamesScanReport at: 'dominantRootsInSuffix')at: aSuffix value) first value.
-			self dictionaryOfColors at: dominantClasse];
-		"size: [ :suffix | suffix key ];"withTextAbove: #value.
-b nodes: (aSinglePackageScanReport at: 'allClassNameSuffixesSorted')
-forEach:[:suffix|
-					
-					b shape rectangle.
-					b shape color: [:aClassScanReport|((aClassScanReport at: 'className') = 'Object' ) ifTrue:[Color black] ifFalse:[self dictionaryOfColors at: (aClassScanReport at: 'rootClass')  ]];
-					borderColor:[: aClassScanReport | (aClassScanReport at: 'className') = (aClassScanReport at: 'rootClass') name ifTrue:[Color black] ifFalse:[(self dictionaryOfColors at: (aClassScanReport at: 'rootClass')) adjustBrightness: -0.1]];
-					borderWidth: 1.
-					b nodes: ((aSinglePackageScanReport at: 'classesGroupedBySuffixes') at: suffix value).
-					b layout grid.
-					].	
-				b layout grid.
-		"self halt."
-].
-b layout grid.
-"classNamesScanReport at: 'classBlueprint' put: [ :aGroupOfScanReports | b]."
-b]
+		nodes: self scannedPackages
+		forEach: [ :aSinglePackage | 
+			| aSinglePackageScanReport |
+			aSinglePackageScanReport := aSinglePackage vocabularyScanner
+				classNamesScanReport.
+			b shape rectangle.
+			b shape
+				color: [ :aSuffix | 
+					| dominantClasse |
+					dominantClasse := ((self classNamesScanReport
+						at: 'dominantRootsInSuffix') at: aSuffix value) first value.
+					self dictionaryOfColors at: dominantClasse ];
+				withTextAbove: #value.
+			b
+				nodes: (aSinglePackageScanReport at: 'allClassNameSuffixesSorted')
+				forEach: [ :suffix | 
+					b shape: RTEllipse new.
+					b shape
+						size:
+							[ :aClassScanReport | 50 / (aClassScanReport at: 'superclasses') size ].
+					b shape
+						color: [ :aClassScanReport | 
+							(aClassScanReport at: 'className') = 'Object'
+								ifTrue: [ Color black ]
+								ifFalse: [ self dictionaryOfColors at: (aClassScanReport at: 'rootClass') ] ];
+						borderColor: [ :aClassScanReport | 
+							(aClassScanReport at: 'className')
+								= (aClassScanReport at: 'rootClass') name
+								ifTrue: [ Color black ]
+								ifFalse: [ (self dictionaryOfColors at: (aClassScanReport at: 'rootClass'))
+										adjustBrightness: -0.1 ] ];
+						borderWidth: 1.
+					b
+						nodes:
+							((aSinglePackageScanReport at: 'classesGroupedBySuffixes')
+								at: suffix value).
+					b edges
+						connectFrom: [ :aClassScanReport | (aClassScanReport at: 'superclasse') vocabularyScanner classNamesScanReport].
+					b layout grid ].
+			b layout grid ].
+	b layout grid.
+	b view elements do: [ :element| element @ (RTPopup new text: element model viewInClassBluePrint). ].
+	^ b]
 ]
 
 { #category : #Accessing }
