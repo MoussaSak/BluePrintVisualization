@@ -28,6 +28,11 @@ FAMIXClass >> superclasses [
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
+FAMIXClass >> vocabularyScanner [
+	^ vocabularyScanner
+]
+
+{ #category : #'*ClassNamesAnalyzer' }
 FAMIXClass >> vocabularyScanner: aFAMIXClassScanner [ 
 	vocabularyScanner := aFAMIXClassScanner
 ]

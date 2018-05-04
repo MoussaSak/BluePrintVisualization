@@ -19,6 +19,7 @@ FAMIXClassScanner >> defaultMetrics [
 		at: 'className' put: [ :aFAMIXClassScanner | aFAMIXClassScanner scannedClass name ];
 		at: 'classSuffix' put: [ :aFAMIXClassScanner | aFAMIXClassScanner scannedClass name splitWithCamelCase last];
 		at: 'superclasses' put: [  :aFAMIXClassScanner | aFAMIXClassScanner scannedClass superclasses ];
+		at: 'superclasse' put: [  :aFAMIXClassScanner | aFAMIXClassScanner scannedClass superclass ];
 		at: 'rootClass' put: [  :aFAMIXClassScanner | (aFAMIXClassScanner classNamesScanReport at: 'superclasses') first];
 		yourself
 ]
