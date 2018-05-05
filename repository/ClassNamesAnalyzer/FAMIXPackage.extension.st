@@ -1,6 +1,11 @@
 Extension { #name : #FAMIXPackage }
 
 { #category : #'*ClassNamesAnalyzer' }
+FAMIXPackage >> mouseAnnouncer [
+	^RTPopup new text: self viewInClassBluePrint
+]
+
+{ #category : #'*ClassNamesAnalyzer' }
 FAMIXPackage >> packageViewIn: composite [
 	<gtInspectorPresentationOrder: -10>
 	<moosePresentationOrder: -20>
@@ -12,6 +17,11 @@ FAMIXPackage >> packageViewIn: composite [
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXPackage >> scanClassNames [
 	^FAMIXPackageScanner scan: self
+]
+
+{ #category : #'*ClassNamesAnalyzer' }
+FAMIXPackage >> viewInClassBluePrint [
+	^'package Name: ', (vocabularyScanner classNamesScanReport at: 'packageName') asString
 ]
 
 { #category : #'*ClassNamesAnalyzer' }

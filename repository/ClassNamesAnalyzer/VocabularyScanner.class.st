@@ -59,7 +59,7 @@ VocabularyScanner >> classBluePrint [
 			b
 				nodes: (aSinglePackageScanReport at: 'allClassNameSuffixesSorted')
 				forEach: [ :suffix | 
-					b shape: RTEllipse new.
+					b shape rectangle.
 					b shape
 						size:
 							[ :aClassScanReport | 50 / (aClassScanReport at: 'superclasses') size ].
@@ -84,8 +84,13 @@ VocabularyScanner >> classBluePrint [
 					b layout grid ].
 			b layout grid ].
 	b layout grid.
-	b view elements do: [ :element| element @ (RTPopup new text: element model viewInClassBluePrint). ].
-	^ b]
+	
+	
+	b view elements do: [ :element| element announcer subscriptions  subscriptions do: [ :each | element announcer subscriptions  subscriptions remove: each ]].
+	b view elements do: [ :element| element @ (element model mouseAnnouncer)].
+	b edges view edges do: [ :each| each color: ((each from color adjustBrightness: -0.1) alpha: 0.1) ].
+	
+	^ b view signalUpdate; yourself]
 ]
 
 { #category : #Accessing }
