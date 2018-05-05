@@ -83,6 +83,12 @@ VocabularyScanner >> classBluePrint [
 						nodes:
 							((aSinglePackageScanReport at: 'classesGroupedBySuffixes')
 								at: suffix value).
+								b shape line color: [ :aSingleClassScanReport | 
+							self dictionaryOfColors
+								ifNil: [ self scannedEntities mooseModel allPackages scanClassNames ].
+							(self dictionaryOfColors
+								at: (aSingleClassScanReport key at: 'rootClass'))
+								adjustBrightness: -0.1; alpha: 0.1 ] .
 					b edges
 						connectFrom: [ :aClassScanReport | (aClassScanReport at: 'superclasse') ifNotNil: [ (aClassScanReport at: 'superclasse') vocabularyScanner classNamesScanReport ] ].
 					b layout grid ].
@@ -92,10 +98,9 @@ VocabularyScanner >> classBluePrint [
 	
 	b view elements do: [ :element| element announcer subscriptions  subscriptions do: [ :each | element announcer subscriptions  subscriptions remove: each ]].
 	b view elements do: [ :element| element @ (element model mouseAnnouncer)].
-	b edges view edges do: [ :each| each color: ((each from color adjustBrightness: -0.1) alpha: 0.1) ].
-	
-	b view signalUpdate.
-	^ b build
+	b
+	"b view signalUpdate.
+	^ b build"
 	]
 ]
 
