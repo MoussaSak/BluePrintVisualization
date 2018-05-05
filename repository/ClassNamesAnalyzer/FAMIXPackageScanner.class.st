@@ -16,7 +16,7 @@ FAMIXPackageScanner >> defaultMetrics [
 		at: 'packageName' put: [ :argh | self scannedPackage name ];
 		at: 'allClasses' put: [ :aSingleClassScanReports | aSingleClassScanReports collect: #scannedClass ];
 		at: 'dominantRootsInSuffix' put: [ :aGroupOfScanReports | 
-			((self classNamesScanReport at: 'rootClassesGroupedBySuffixes' ifAbsentPut: [(self defaultMetrics at:'rootClassesGroupedBySuffixes') value: aGroupOfScanReports]) collect: [:association|association key -> association value sortedCounts])asDictionary];
+			((self classNamesScanReport at: 'rootClassesGroupedBySuffixes' ifAbsentPut: [(self defaultMetrics at:'rootClassesGroupedBySuffixes') value: aGroupOfScanReports]) collect: [:association|association key -> association value asBag sortedCounts])asDictionary];
 		at: 'colorsOfRootClasses' put: [ :aSingleClassScanReports | self scannedPackage mooseModel dictionaryOfRootClassColors ];
 		at: 'allRootClassesSortedByNumberOfSubClasses' put: [ :aGroupOfScanReports | ((self classNamesScanReport at: 'allRootClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClasses') value: aGroupOfScanReports]) collect:#key) asBag sortedCounts];
 		at: 'classNames'
@@ -46,18 +46,23 @@ FAMIXPackageScanner >> defaultMetrics [
 				ifAbsentPut: [ (self defaultMetrics at: 'classesAndSuffixes') value: aSingleClassScanReports ].
 			classNamesAndSuffixes
 				do: [ :anAssociation | 
-					|aSuffix aClass|
+					|aSuffix aClass classIsRoot|
 					aSuffix := anAssociation value.
 					aClass := anAssociation key.
+					classIsRoot := aClass at: 'isRoot'" ifAbsentPut: [ (self defaultMetrics at: 'isRoot') value: aClass ]".
 					aDictionary
 						at: aSuffix
-						ifPresent: [ aDictionary
-								at: aSuffix
-								put:
-									((aDictionary at: aSuffix)
-										add: aClass;
-										yourself) ]
-						ifAbsentPut: [ Bag with: aClass ] ].
+						ifPresent: [ (classIsRoot) ifTrue: [(aDictionary
+								at: aSuffix)
+								addFirst:
+									 aClass;
+										yourself]
+									ifFalse: [ (aDictionary
+								at: aSuffix)
+								addLast:
+									 aClass;
+										yourself ] ]
+						ifAbsentPut: [ OrderedCollection with: aClass ] ].
 			aDictionary ];
 		at: 'allClassNameSuffixes'
 			put:
