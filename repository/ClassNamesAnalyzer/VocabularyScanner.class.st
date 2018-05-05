@@ -84,7 +84,7 @@ VocabularyScanner >> classBluePrint [
 							((aSinglePackageScanReport at: 'classesGroupedBySuffixes')
 								at: suffix value).
 					b edges
-						connectFrom: [ :aClassScanReport | (aClassScanReport at: 'superclasse') vocabularyScanner classNamesScanReport].
+						connectFrom: [ :aClassScanReport | (aClassScanReport at: 'superclasse') ifNotNil: [ (aClassScanReport at: 'superclasse') vocabularyScanner classNamesScanReport ] ].
 					b layout grid ].
 			b layout grid ].
 	b layout grid.
