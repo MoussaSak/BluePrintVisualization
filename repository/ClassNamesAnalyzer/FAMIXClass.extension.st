@@ -29,7 +29,7 @@ FAMIXClass >> superclasses [
 
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXClass >> vocabularyScanner [
-	^ vocabularyScanner
+	^ vocabularyScanner ifNil: [ self scanClassNames ]
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
