@@ -54,15 +54,19 @@ VocabularyScanner >> classBluePrint [
 					| dominantClasse |
 					dominantClasse := ((self classNamesScanReport
 						at: 'dominantRootsInSuffix') at: aSuffix value) first value.
+						"if DictionaryOfColors is nil this means that the group of packages has not been scnned yet. Then scan it"
+						self dictionaryOfColors ifNil:[
+							self scannedEntities mooseModel allPackages scanClassNames
+							].
 					self dictionaryOfColors at: dominantClasse ];
 				withTextAbove: #value.
 			b
 				nodes: (aSinglePackageScanReport at: 'allClassNameSuffixesSorted')
 				forEach: [ :suffix | 
-					b shape: RTEllipse new.
+					b shape rectangle.
 					b shape
 						size:
-							[ :aClassScanReport | 50 / (aClassScanReport at: 'superclasses') size ].
+							[ :aClassScanReport | 50 / ((aClassScanReport at: 'superclassesInCurrentPackage') size + 1) ].
 					b shape
 						color: [ :aClassScanReport | 
 							(aClassScanReport at: 'className') = 'Object'
@@ -90,7 +94,9 @@ VocabularyScanner >> classBluePrint [
 	b view elements do: [ :element| element @ (element model mouseAnnouncer)].
 	b edges view edges do: [ :each| each color: ((each from color adjustBrightness: -0.1) alpha: 0.1) ].
 	
-	^ b build]
+	b view signalUpdate.
+	^ b build
+	]
 ]
 
 { #category : #Accessing }
