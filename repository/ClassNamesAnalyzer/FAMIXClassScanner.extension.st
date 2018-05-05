@@ -10,8 +10,20 @@ FAMIXClassScanner >> defaultMetrics [
 		at: 'className' put: [ :aFAMIXClassScanner | aFAMIXClassScanner scannedClass name ];
 		at: 'classSuffix' put: [ :aFAMIXClassScanner | aFAMIXClassScanner scannedClass name splitWithCamelCase last];
 		at: 'superclasses' put: [  :aFAMIXClassScanner | aFAMIXClassScanner scannedClass superclasses ];
+		at: 'superclassesInCurrentPackage' put: [  :aFAMIXClassScanner | (aFAMIXClassScanner classNamesScanReport at: 'superclasses' ifAbsentPut: [  (self defaultMetrics at: 'superclasses') value: aFAMIXClassScanner  ]) select: [ :aFamixPackage| aFamixPackage parentPackage = aFAMIXClassScanner scannedClass parentPackage] ];
 		at: 'superclasse' put: [  :aFAMIXClassScanner | aFAMIXClassScanner scannedClass superclass ];
-		at: 'rootClass' put: [  :aFAMIXClassScanner | (aFAMIXClassScanner classNamesScanReport at: 'superclasses') first];
+		at: 'rootClass' put: [  :aFAMIXClassScanner | (aFAMIXClassScanner classNamesScanReport at: 'superclasses' ifAbsentPut: [  (self defaultMetrics at: 'superclasses') value: aFAMIXClassScanner  ]) first  ];
+		at: 'isRoot' put: [ :aFAMIXClassScanner | |className rootClassName| 
+			className := aFAMIXClassScanner classNamesScanReport
+				at: 'className'
+				ifAbsentPut: [ (self defaultMetrics at: 'className') value: aFAMIXClassScanner ].
+			rootClassName := (aFAMIXClassScanner classNamesScanReport
+				at: 'rootClass'
+				ifAbsentPut: [ (self defaultMetrics at: 'rootClass') value: aFAMIXClassScanner ]) name.
+				
+				className = rootClassName ];
+
+
 		yourself
 ]
 
