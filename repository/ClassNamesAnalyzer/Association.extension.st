@@ -1,11 +1,11 @@
 Extension { #name : #Association }
 
-{ #category : #'*classNamesAnalyzer' }
+{ #category : #'*ClassNamesAnalyzer' }
 Association >> mouseAnnouncer [
 	^RTPopup new text: self viewInClassBluePrint
 ]
 
-{ #category : #'*classNamesAnalyzer' }
+{ #category : #'*ClassNamesAnalyzer' }
 Association >> viewInClassBluePrint [
 	^value
 ]
