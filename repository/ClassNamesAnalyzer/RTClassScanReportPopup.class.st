@@ -11,9 +11,9 @@ RTClassScanReportPopup >> initializeElement: element [
 		when: TRMouseEnter
 		do: [ :event | 
 			element outgoingEdges
-				do: [ :each | each color: (Color black alpha: 1) ] .
+				do: [ :each | each color: (Color red) ] .
 			element incomingEdges 
-				do: [ :each | each color: Color red ]].
+				do: [ :each | each color: Color black ]].
 	element
 		when: TRMouseLeave
 		do: [ :event | 
