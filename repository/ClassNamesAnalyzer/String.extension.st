@@ -3,9 +3,9 @@ Extension { #name : #String }
 { #category : #'*ClassNamesAnalyzer' }
 String >> splitWithCamelCase [
 "
-'GoodMoriningAmerica' splitWithCamelCase = (OrderedCollection with:'Good' with:'Morining' with:'America')
-'GCOptimizer' splitWithCamelCase = (OrderedCollection with:'GC' with:'Optimizer')
-'optimizerOfGC' splitWithCamelCase  = (OrderedCollection with:'optimizer' with: 'Of' with: 'GC')
+'GoodMoriningAmerica' splitWithCamelCase = (OrderedCollection with:'Good' with:'Morining' with:'America')"
+"'GCOptimizer' splitWithCamelCase = (OrderedCollection with:'GC' with:'Optimizer')"
+"'optimizerOfGC' splitWithCamelCase  = (OrderedCollection with:'optimizer' with: 'Of' with: 'GC')
 "
 
 	| pastIndex  tokens newWord |

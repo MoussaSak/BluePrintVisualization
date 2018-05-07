@@ -80,6 +80,11 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 ]
 
 { #category : #accessing }
+FAMIXPackagesGroupScanner >> groupOfPackagesScanReport [
+	^ self classNamesScanReport
+]
+
+{ #category : #accessing }
 FAMIXPackagesGroupScanner >> initialize [
 	super initialize.
 	availableColors := self class allColors

@@ -26,7 +26,7 @@ FAMIXPackage >> viewInClassBluePrint [
 
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXPackage >> vocabularyScanner [
-	^ vocabularyScanner ifNil:[vocabularyScanner := FAMIXPackageScanner scan: self]
+	^ vocabularyScanner ifNil:[vocabularyScanner := FAMIXPackageScanner scan: self] 
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
