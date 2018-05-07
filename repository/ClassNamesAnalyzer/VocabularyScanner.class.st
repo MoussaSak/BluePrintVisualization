@@ -52,7 +52,7 @@ VocabularyScanner >> classBluePrint [
 			b shape
 				color: [ :aSuffix | 
 					| dominantClasse |
-					dominantClasse := ((self classNamesScanReport
+					dominantClasse := ((self groupOfPackagesScanReport
 						at: 'dominantRootsInSuffix') at: aSuffix value) first value.
 						"if DictionaryOfColors is nil this means that the group of packages has not been scnned yet. Then scan it"
 						self dictionaryOfColors ifNil:[

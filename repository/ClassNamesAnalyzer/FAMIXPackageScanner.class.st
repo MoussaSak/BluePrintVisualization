@@ -92,6 +92,12 @@ FAMIXPackageScanner >> defaultMetrics [
 ]
 
 { #category : #accessing }
+FAMIXPackageScanner >> groupOfPackagesScanReport [
+	"Ugly hack. Should be removed once suffixes are grouped in a dedicated report"
+	^self scannedEntities mooseModel allPackages scanClassNames classNamesScanReport
+]
+
+{ #category : #accessing }
 FAMIXPackageScanner >> scannedPackage [
 	^ self scannedEntities
 ]
