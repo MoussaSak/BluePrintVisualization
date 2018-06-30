@@ -29,10 +29,10 @@ FAMIXClass >> superclasses [
 
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXClass >> vocabularyScanner [
-	^ vocabularyScanner ifNil: [ self scanClassNames ] 
+	^ self privateState attributeAt: #vocabularyScanner ifAbsentPut: ( self scanClassNames ).
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXClass >> vocabularyScanner: aFAMIXClassScanner [ 
-	vocabularyScanner := aFAMIXClassScanner
+	self privateState attributeAt: #vocabularyScanner put: aFAMIXClassScanner.
 ]

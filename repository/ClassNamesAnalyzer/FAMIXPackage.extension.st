@@ -21,16 +21,15 @@ FAMIXPackage >> scanClassNames [
 
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXPackage >> viewInClassBluePrint [
-	^'package Name: ', (vocabularyScanner classNamesScanReport at: 'packageName') asString
+	^'package Name: ', (self vocabularyScanner classNamesScanReport at: 'packageName') asString
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXPackage >> vocabularyScanner [
-	^ vocabularyScanner ifNil:[vocabularyScanner := FAMIXPackageScanner scan: self] 
+	^ self privateState attributeAt: #vocabularyScanner ifAbsentPut: (FAMIXPackageScanner scan: self)
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXPackage >> vocabularyScanner: aFAMIXPackageScanner [ 
-	vocabularyScanner := aFAMIXPackageScanner 
-
+FAMIXPackage >> vocabularyScanner: aFAMIXClassScanner [ 
+	self privateState attributeAt: #vocabularyScanner put: aFAMIXClassScanner.
 ]
