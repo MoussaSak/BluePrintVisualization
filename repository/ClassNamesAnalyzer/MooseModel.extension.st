@@ -2,10 +2,10 @@ Extension { #name : #MooseModel }
 
 { #category : #'*ClassNamesAnalyzer' }
 MooseModel >> dictionaryOfRootClassColors [
-	^ dictionaryOfRootClassColors
+	^self privateState attributeAt: #dictionaryOfRootClassColors ifAbsentPut: nil
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
 MooseModel >> dictionaryOfRootClassColors: aCollection [ 
-	dictionaryOfRootClassColors := aCollection 
+	self privateState attributeAt: #dictionaryOfRootClassColors put: aCollection 
 ]
