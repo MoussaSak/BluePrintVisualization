@@ -5,6 +5,12 @@ Class {
 }
 
 { #category : #accessing }
+GroupOfPackagesScanReport >> at: key ifAbsent: aBlock [ 
+	"self halt."
+	^super at: key ifAbsent: aBlock 
+]
+
+{ #category : #accessing }
 GroupOfPackagesScanReport >> singlePackageScanReports [
 	^ self subEntityScanReports
 ]

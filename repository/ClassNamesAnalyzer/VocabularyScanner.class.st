@@ -35,8 +35,9 @@ VocabularyScanner >> addaMetric: metricName with: aBlock [
 
 { #category : #Visualizations }
 VocabularyScanner >> classBluePrint [
-		| b sortedRootClasses dictionaryOfColors|
-	^classNamesScanReport at: 'classBlueprint' ifAbsentPut:[	b := RTMondrian new.
+		| b sortedRootClasses dictionaryOfColors delay|
+	^classNamesScanReport at: 'classBlueprint' ifAbsentPut:[	delay := Time now.
+			b := RTMondrian new.
 	sortedRootClasses := (self classNamesScanReport
 		at: 'allRootClassesSortedByNumberOfSubClasses') collect: #value.
 	dictionaryOfColors := self classNamesScanReport
@@ -92,14 +93,15 @@ VocabularyScanner >> classBluePrint [
 	
 	b view elements do: [ :element| element announcer subscriptions  subscriptions do: [ :each | element announcer subscriptions  subscriptions remove: each ]].
 	b view elements do: [ :element| element @ (element model mouseAnnouncer)].
+	"Reset visual elements of scannedClasses"
+	self scannedEntities mooseModel allClasses do: [ :each| each visualElement: nil ].
+	b view elements do: [:element| (element model class canUnderstand: #visualElement) ifTrue: [ element model visualElement: element ] ].
 
-b shape line color: (Color white alpha: 0.05).
-	b edges: ((self classNamesScanReport at:'allClasses') collect: [ :each| 
-								each vocabularyScanner classNamesScanReport ]) from: #yourself to: [ :aClassScanReport| (aClassScanReport at: 'superclasse') ifNotNil: [ (aClassScanReport at: 'superclasse') vocabularyScanner classNamesScanReport ] ].
-	
-	
-	
-	
+(TimeProfiler spyOn:[b shape line color: (Color white alpha: 0.05).
+
+b edges: ((self classNamesScanReport at:'allClasses') collect: [ :each| 
+								each vocabularyScanner classNamesScanReport visualElement ]) fromElement: #visualElement toElement: [ :aClassScanReport| (aClassScanReport at: 'superclasse') ifNotNil: [ (aClassScanReport at: 'superclasse') visualElement ] ].	])showResult: self.
+		Transcript show: (Time now asSeconds - delay asSeconds) asString; cr.						
 	^ b
 	]
 ]

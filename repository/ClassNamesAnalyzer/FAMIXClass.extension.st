@@ -28,6 +28,16 @@ FAMIXClass >> superclasses [
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
+FAMIXClass >> visualElement [
+	^ self privateState attributeAt: #visualElement ifAbsentPut: ( nil ).
+]
+
+{ #category : #'*ClassNamesAnalyzer' }
+FAMIXClass >> visualElement: aRTElement [ 
+	self privateState attributeAt: #visualElement put: aRTElement.
+]
+
+{ #category : #'*ClassNamesAnalyzer' }
 FAMIXClass >> vocabularyScanner [
 	^ self privateState attributeAt: #vocabularyScanner ifAbsentPut: ( self scanClassNames ).
 ]
