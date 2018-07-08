@@ -6,7 +6,7 @@ FAMIXPackageGroup >> packageViewIn: composite [
 	<moosePresentationOrder: -20>
 	composite roassal2
 		title: 'NameBlueprint';
-		initializeView: [ self vocabularyScanner classBluePrint]
+		initializeView: [ self vocabularyScanner classBluePrint ]
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
