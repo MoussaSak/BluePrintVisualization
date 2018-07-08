@@ -9,6 +9,12 @@ Class {
 }
 
 { #category : #accessing }
+VocabularyScanReport >> = aReport [
+	^ aReport ifNotNil: [scannedEntity = aReport scannedEntity]
+	ifNil:[false]
+]
+
+{ #category : #accessing }
 VocabularyScanReport >> scannedEntity [
 	^ scannedEntity
 ]

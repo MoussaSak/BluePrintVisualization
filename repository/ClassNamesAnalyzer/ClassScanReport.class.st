@@ -20,13 +20,3 @@ ClassScanReport >> viewInClassBluePrint [
 	 'superclass: ',(self at: 'superclasse') name, String cr,
 	 'Root Class: ',(self at: 'rootClass') name. 
 ]
-
-{ #category : #Visualisation }
-ClassScanReport >> visualElement [
-	^self scannedEntity visualElement.
-]
-
-{ #category : #Accessing }
-ClassScanReport >> visualElement: aRTElement [ 
-	self scannedEntity visualElement: aRTElement.
-]
