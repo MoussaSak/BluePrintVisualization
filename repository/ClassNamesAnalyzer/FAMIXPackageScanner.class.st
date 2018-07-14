@@ -11,6 +11,7 @@ FAMIXPackageScanner class >> reportClass [
 
 { #category : #accessing }
 FAMIXPackageScanner >> defaultMetrics [
+	
 	^ Dictionary new
 		at: 'numberOfPackages' put: [ :argh | 1 ];
 		at: 'packageName' put: [ :argh | self scannedPackage name ];
@@ -30,7 +31,6 @@ FAMIXPackageScanner >> defaultMetrics [
 		at: 'rootClassesGroupedBySuffixes'
 			put: [ :aSingleClassScanReports | 
 			| classesGroupedBySuffixes |
-			
 			classesGroupedBySuffixes := self classNamesScanReport
 				at: 'classesGroupedBySuffixes'
 				ifAbsentPut: [ (self defaultMetrics at: 'classesGroupedBySuffixes') value: aSingleClassScanReports ].
@@ -70,10 +70,11 @@ FAMIXPackageScanner >> defaultMetrics [
 			
 		at: 'allClassNameSuffixesSorted'
 			put: [ :aSingleClassScanReports | 
-			(self classNamesScanReport
-				at: 'allClassNameSuffixes'
-				ifAbsentPut: [ (self defaultMetrics at: 'allClassNameSuffixes') value: aSingleClassScanReports ]) asBag
-				sortedCounts ];
+				|suffixScanReports|
+				suffixScanReports := (aSingleClassScanReports collect:[:aSingleClassReport| SuffixScanReport with: aSingleClassReport]).
+				self allClassNameSuffixesSorted: suffixScanReports
+				];
+			
 		at: 'allClassNameSuffixesAsSet'
 			put: [ :aSingleClassScanReports | 
 			(self classNamesScanReport

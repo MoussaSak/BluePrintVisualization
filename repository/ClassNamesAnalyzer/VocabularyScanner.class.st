@@ -33,6 +33,30 @@ VocabularyScanner >> addaMetric: metricName with: aBlock [
 	
 ]
 
+{ #category : #metrics }
+VocabularyScanner >> allClassNameSuffixesSorted: suffixScanReports [
+
+	| agregatedSuffixScanReports |
+	agregatedSuffixScanReports := OrderedCollection new.
+				[suffixScanReports notEmpty] whileTrue: [ 
+				|aSuffixDescriptor descriptorsOfSameSuffix indexesOfDescriptorsOfSameSuffix| 
+				indexesOfDescriptorsOfSameSuffix := OrderedCollection new.
+				aSuffixDescriptor := suffixScanReports first.
+				suffixScanReports removeFirst.
+				1 to: suffixScanReports size do: [:index| (((suffixScanReports at:index) suffix) = aSuffixDescriptor suffix) ifTrue: [indexesOfDescriptorsOfSameSuffix add: index]].
+				descriptorsOfSameSuffix := indexesOfDescriptorsOfSameSuffix collect: [ :i| suffixScanReports at: i ].
+				
+				aSuffixDescriptor mergeWith: descriptorsOfSameSuffix.
+				"aSuffixDescriptor at: #suffix put: aSuffixDescriptor suffix."
+				agregatedSuffixScanReports add: aSuffixDescriptor.
+				
+							indexesOfDescriptorsOfSameSuffix reversed do: [:i| suffixScanReports removeAt: i]
+				]. 
+				agregatedSuffixScanReports sort: [:first :second| first numberOfClasses > second numberOfClasses].
+				^agregatedSuffixScanReports collect: [ :each| each numberOfClasses->each  ].
+
+]
+
 { #category : #Visualizations }
 VocabularyScanner >> classBluePrint [
 		| b sortedRootClasses dictionaryOfColors delay |
@@ -54,15 +78,15 @@ VocabularyScanner >> classBluePrint [
 				color: [ :aSuffix | 
 					| dominantClasse |
 					dominantClasse := ((self groupOfPackagesScanReport
-						at: 'dominantRootsInSuffix') at: aSuffix value) first value.
-						"if DictionaryOfColors is nil this means that the group of packages has not been scnned yet. Then scan it"
+						at: 'dominantRootsInSuffix') at: aSuffix value suffix) first value.
+						"if DictionaryOfColors is nil this means that the group of packages has not been scanned yet. Then scan it"
 						self dictionaryOfColors ifNil:[
 							self scannedEntities mooseModel allPackages scanClassNames
 							].
 					self dictionaryOfColors at: dominantClasse ];
-				withTextAbove: #value.
+				withTextAbove: [:each| each value suffix].
 			b
-				nodes: (aSinglePackageScanReport at: 'allClassNameSuffixesSorted')
+				nodes: ((self groupOfPackagesScanReport at: 'allClassNameSuffixesSorted') select: [ :association| association value packages includes: aSinglePackageScanReport scannedEntity ]  )
 				forEach: [ :suffix | 
 					b shape rectangle.
 					b shape
@@ -70,9 +94,8 @@ VocabularyScanner >> classBluePrint [
 							[ :aClassScanReport | 50 / ((aClassScanReport at: 'superclassesInCurrentPackage') size + 1) ].
 					b shape
 						color: [ :aClassScanReport | 
-							(aClassScanReport at: 'className') = 'Object'
-								ifTrue: [ Color black ]
-								ifFalse: [ self dictionaryOfColors at: (aClassScanReport at: 'rootClass') ] ];
+						"self halt."
+							 self dictionaryOfColors at: (aClassScanReport at: 'rootClass')  ];
 						borderColor: [ :aClassScanReport | 
 							(aClassScanReport at: 'className')
 								= (aClassScanReport at: 'rootClass') name
@@ -83,7 +106,7 @@ VocabularyScanner >> classBluePrint [
 					b
 						nodes:
 							((aSinglePackageScanReport at: 'classesGroupedBySuffixes')
-								at: suffix value).
+								at: suffix value suffix).
 								
 					
 					b layout grid ].
@@ -98,7 +121,7 @@ b shape line color: (Color white alpha: 0.05).
 	b edges: ((self classNamesScanReport at:'allClasses') collect: [ :each| 
 								each vocabularyScanner classNamesScanReport ]) from: #yourself to: [ :aClassScanReport| (aClassScanReport at: 'superclasse') ifNotNil: [ (aClassScanReport at: 'superclasse') vocabularyScanner classNamesScanReport ] ].
 	
-	Transcript show: (Time now asSeconds - delay asSeconds )asString.
+	Transcript show: (Time now asSeconds - delay asSeconds )asString;cr.
 	
 	
 	^ b
