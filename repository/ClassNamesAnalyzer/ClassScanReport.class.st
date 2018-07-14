@@ -6,7 +6,7 @@ Class {
 
 { #category : #Visualisation }
 ClassScanReport >> mouseAnnouncer [
-	^RTClassScanReportPopup new text: self viewInClassBluePrint
+	^RTClassScanReportPopup new text: self viewInClassBluePrint; alphaPopupBackground: 0.7; textColor: Color green; backgroundColor: Color black
 ]
 
 { #category : #accessing }

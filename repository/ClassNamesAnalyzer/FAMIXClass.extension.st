@@ -1,8 +1,13 @@
 Extension { #name : #FAMIXClass }
 
 { #category : #'*ClassNamesAnalyzer' }
+FAMIXClass >> isMetaRoot [
+	^self nameSuffix = 'Object'
+]
+
+{ #category : #'*ClassNamesAnalyzer' }
 FAMIXClass >> isaRootClass [
-	^self superclass = nil or: [self superclass nameSuffix = 'Object'].
+	^self superclass = nil or: [self superclass isMetaRoot].
 ]
 
 { #category : #'*ClassNamesAnalyzer' }

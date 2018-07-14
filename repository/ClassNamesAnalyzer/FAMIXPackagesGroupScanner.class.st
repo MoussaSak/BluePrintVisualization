@@ -32,15 +32,25 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 		at: 'classNames' put: [ :aGroupOfScanReports | aGroupOfScanReports flatCollect: [ :aPackageScanReport| aPackageScanReport at: 'classNames']];
 		at: 'allRootClasses' put: [ :aGroupOfScanReports | aGroupOfScanReports flatCollect: [ :aPackageScanReport| aPackageScanReport at: 'allRootClasses']];
 		
-		at: 'hierarchiesGroupedBySuffixes' put: [ :aGroupOfScanReports | 
-			|aDictionary|
+				at: 'hierarchiesGroupedBySuffixes' put: [ :aGroupOfScanReports | 
+					((self classNamesScanReport at: 'allClassNameSuffixesSorted' ifAbsentPut: [(self defaultMetrics at:'allClassNameSuffixesSorted') value: aGroupOfScanReports]) collect: [:association|
+						association value suffix->association value hierarchies]) asDictionary
+					];
+
+		
+		at: 'allClassNameSuffixesSorted' put: [ :aGroupOfScanReports | 
+			|suffixScanReports|
+			suffixScanReports := ((self classNamesScanReport subEntityScanReports collect: [ :aPackageScanReport|  aPackageScanReport at: 'allClassNameSuffixesSorted']) flatCollect: #value)collect: #value.
+			self allClassNameSuffixesSorted: suffixScanReports.
+			
+			"|aDictionary|
 			aDictionary := Dictionary new.
 (self classNamesScanReport at: 'allRootClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClasses') value: aGroupOfScanReports]) collect: [:association|
 	|suffix rootClass|
 	suffix := association value at: 'classSuffix'.
 	rootClass := association key.
 	aDictionary at: suffix ifPresent: [(aDictionary at: suffix) add: rootClass ] ifAbsentPut: [Bag with: rootClass] ].
-	aDictionary];
+	aDictionary"];
 
 		at: 'dominantRootsInSuffix' put: [ :aGroupOfScanReports | 
 			((self classNamesScanReport at: 'hierarchiesGroupedBySuffixes' ifAbsentPut: [(self defaultMetrics at:'hierarchiesGroupedBySuffixes') value: aGroupOfScanReports])associations collect: [:association|association key -> association value sortedCounts])asDictionary];
@@ -74,7 +84,7 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 			|aDictionaryOfColors i|
 			i := 0.
 			aDictionaryOfColors := Dictionary new.
-			(self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClassesSortedByNumberOfSubClasses') value: aGroupOfScanReports] ) do: [ :aRootClass| i:= i+1. aDictionaryOfColors at: aRootClass value put: (self pickAnAvailableColorNumber: i) ]. self saveInMooseModel: aDictionaryOfColors ];
+			(self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClassesSortedByNumberOfSubClasses') value: aGroupOfScanReports] ) do: [ :aRootClass| aRootClass value isMetaRoot ifTrue: [aDictionaryOfColors at: aRootClass value put: (Color gray: 1) ] ifFalse: [ i:= i+1. aDictionaryOfColors at: aRootClass value put: (self pickAnAvailableColorNumber: i) ]. self saveInMooseModel: aDictionaryOfColors ]];
 		
 		yourself
 ]
@@ -101,7 +111,8 @@ FAMIXPackagesGroupScanner >> mergeSinglePackageScanReports: aCollectionOfPackage
 
 { #category : #'instance-creation' }
 FAMIXPackagesGroupScanner >> pickAnAvailableColorNumber: indexOfColors [
-	indexOfColors < (availableColors size) ifTrue:[^availableColors at: indexOfColors]
+"Color grey: 1 is used for Meta Root classes"
+	indexOfColors <= (availableColors size) ifTrue:[^availableColors at: indexOfColors]
 	ifFalse:[ ^Color gray: indexOfColors / (availableColors size) ]
 ]
 
