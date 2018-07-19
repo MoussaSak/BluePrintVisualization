@@ -1,6 +1,14 @@
 Extension { #name : #FAMIXClass }
 
 { #category : #'*ClassNamesAnalyzer' }
+FAMIXClass >> allSubInheritances [
+	|aCollection|
+	aCollection := OrderedCollection new.
+	aCollection addAll: subInheritances.
+	^aCollection addAll: ((subInheritances collect: #from) flatCollect: #allSubInheritances);yourself
+]
+
+{ #category : #'*ClassNamesAnalyzer' }
 FAMIXClass >> isMetaRoot [
 	^self nameSuffix = 'Object'
 ]
@@ -34,7 +42,11 @@ FAMIXClass >> superclasses [
 
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXClass >> vocabularyScanner [
-	^ self privateState attributeAt: #vocabularyScanner ifAbsentPut: ( self scanClassNames ).
+|a|
+a := 
+	self privateState attributeAt: #vocabularyScanner ifAbsentPut: (nil).
+	a ifNil: [ a := (self privateState attributeAt: #vocabularyScanner put: ( self scanClassNames )) value ].
+	^a
 ]
 
 { #category : #'*ClassNamesAnalyzer' }

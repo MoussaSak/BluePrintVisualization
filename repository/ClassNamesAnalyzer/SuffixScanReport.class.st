@@ -7,7 +7,8 @@ Class {
 		'classNames',
 		'hierarchies',
 		'packages',
-		'classScanReports'
+		'classScanReports',
+		'dominantHierarchieInPackages'
 	],
 	#category : #'ClassNamesAnalyzer-Reports'
 }
@@ -51,9 +52,10 @@ SuffixScanReport >> dominantHierarchie [
 { #category : #statistics }
 SuffixScanReport >> dominantHierarchieInPackages [
 	|associationsOfPackagesAndHierarchies numberOfclassesBelongingToDominantHierarchy|
-	associationsOfPackagesAndHierarchies := classScanReports asBag collect: [ :each| (each at: 'package')->(each at: 'rootClass') ].
+	^dominantHierarchieInPackages ifNil:
+	[associationsOfPackagesAndHierarchies := classScanReports asBag collect: [ :each| (each at: 'package')->(each at: 'rootClass') ].
 	numberOfclassesBelongingToDominantHierarchy := (associationsOfPackagesAndHierarchies select: [ :each| each value = self dominantHierarchie key first]).
-	^packages collect: [:each| each -> ((numberOfclassesBelongingToDominantHierarchy select: [:ass| ass key = each ]) size / (classScanReports select: [ :report| (report at: 'package') = each]) size) ].
+	dominantHierarchieInPackages := packages collect: [:each| each -> ((numberOfclassesBelongingToDominantHierarchy select: [:ass| ass key = each ]) size / (classScanReports select: [ :report| (report at: 'package') = each]) size) ]]
 ]
 
 { #category : #accessing }
@@ -124,27 +126,30 @@ SuffixScanReport >> suffix: aString [
 
 { #category : #visualization }
 SuffixScanReport >> viewInClassBluePrint [
-	|dominantHierarchyStatName packageOfDominantHierarchy RatioOfClassesBelongingToDominantHierarchy hierarchyDominantedpackages mediumDominanceInDominatedPackages mediumDominanceInDominatedPackagesMsg|
+	|dominantHierarchyStatName packageOfDominantHierarchy RatioOfClassesBelongingToDominantHierarchy hierarchyDominantedpackages mediumDominanceInDominatedPackages mediumDominanceInDominatedPackagesMsg dominanceLevel numberOfClassesUsingThisSuffixInTheDominatedPackage |
+	dominanceLevel := 0.8.
 	dominantHierarchyStatName := self dominantHierarchie key first name.
 	packageOfDominantHierarchy := self dominantHierarchie key second name.
 	RatioOfClassesBelongingToDominantHierarchy := (self dominantHierarchie value * 100) asFloat rounded asString, '% '.
 	
 	
 	hierarchyDominantedpackages := (self dominantHierarchieInPackages select: [ :asso|
-	asso value > 0.8
+	asso value > dominanceLevel
 	 ]).
-hierarchyDominantedpackages ifNotEmpty:[mediumDominanceInDominatedPackages := (hierarchyDominantedpackages inject: 0 into: [ :sum :each| sum + each value ]) / hierarchyDominantedpackages size.
-	mediumDominanceInDominatedPackagesMsg := (mediumDominanceInDominatedPackages * 100) asFloat rounded asString, '% of the classes using this suffix in these packages are subclasses of the dominant hierarchy']
+
+hierarchyDominantedpackages ifNotEmpty:[ mediumDominanceInDominatedPackages := (hierarchyDominantedpackages inject: 0 into: [ :sum :each| sum + each value ]) / hierarchyDominantedpackages size.
+	numberOfClassesUsingThisSuffixInTheDominatedPackage := (self classScanReports select: [ :each| (hierarchyDominantedpackages collect: #key) includes: (each at: 'package')]) size.
+	mediumDominanceInDominatedPackagesMsg := (mediumDominanceInDominatedPackages * 100) asFloat rounded asString, '% of the ', numberOfClassesUsingThisSuffixInTheDominatedPackage asString, ' classes using this suffix in these packages are subclasses of the dominant hierarchy']
 ifEmpty: [ |maxDominance|
 	maxDominance := (self dominantHierarchieInPackages collect: #value)max.
 	mediumDominanceInDominatedPackages := self dominantHierarchieInPackages select: [ :each| each value >= (1/2)"maxDominance" ].
-	 mediumDominanceInDominatedPackagesMsg := 'Only ', mediumDominanceInDominatedPackages size asString, 'package(s) associate this suffix to the dominant hierarchy in ', (maxDominance*100) asFloat rounded asString, '% cases' ] .
+	 mediumDominanceInDominatedPackagesMsg := 'Only ', mediumDominanceInDominatedPackages size asString, 'package(s) associate this suffix to the dominant hierarchy in ', (maxDominance*100) asFloat rounded asString, '% of cases' ] .
 	^'Suffix: ',(self suffix), String cr,
-	 RatioOfClassesBelongingToDominantHierarchy, 'of classes using this suffix are subclasses of ', packageOfDominantHierarchy, '>>', dominantHierarchyStatName, String cr,
-	 
-
-
+	
+	 RatioOfClassesBelongingToDominantHierarchy, 'of the ', self classes size asString, ' classes using this suffix are subclasses of ', packageOfDominantHierarchy, '>>', dominantHierarchyStatName, String cr,
+	
+self dominantHierarchies size asString, 'hierarchies use this suffix', String cr,
 self dominantHierarchieInPackages size asString , ' package(s) use this suffix', String cr,
-'out of which ', hierarchyDominantedpackages size asString, ' package(s) associate it to the dominant hierarchy at more than 80%', String cr,
+'out of which ', hierarchyDominantedpackages size asString, ' package(s) associate it to the dominant hierarchy at more than ', (dominanceLevel * 100) asString ,'%', String cr,
 mediumDominanceInDominatedPackagesMsg
 ]

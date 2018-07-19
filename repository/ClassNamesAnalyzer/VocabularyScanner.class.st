@@ -22,6 +22,7 @@ VocabularyScanner class >> reportClass [
 { #category : #'instance-creation' }
 VocabularyScanner class >> scan: aFAMIXPackageGroup [ 
 	|aVocabularyScanner|
+	
 	aVocabularyScanner := (self new scannedEntities: aFAMIXPackageGroup) generateaClassNamesScanReport;yourself.
 	aFAMIXPackageGroup vocabularyScanner: aVocabularyScanner.
 	^aVocabularyScanner
@@ -60,9 +61,10 @@ VocabularyScanner >> allClassNameSuffixesSorted: suffixScanReports [
 { #category : #Visualizations }
 VocabularyScanner >> classBluePrint [
 		| b sortedRootClasses dictionaryOfColors delay |
-	^classNamesScanReport at: 'classBlueprint' ifAbsentPut:[	b := RTMondrian new.
+	^classNamesScanReport at: 'classBlueprint' ifAbsentPut:[ 	b := RTMondrian new.
 			delay:=Time now.
-	sortedRootClasses := (self classNamesScanReport
+			
+	"TimeProfiler spyOn:["sortedRootClasses := (self classNamesScanReport
 		at: 'allRootClassesSortedByNumberOfSubClasses') collect: #value.
 	dictionaryOfColors := self classNamesScanReport
 		at: 'colorsOfRootClasses'.
@@ -119,7 +121,7 @@ VocabularyScanner >> classBluePrint [
 
 b shape line color: (Color white alpha: 0.05).
 	b edges: ((self classNamesScanReport at:'allClasses') collect: [ :each| 
-								each vocabularyScanner classNamesScanReport ]) from: #yourself to: [ :aClassScanReport| (aClassScanReport at: 'superclasse') ifNotNil: [ (aClassScanReport at: 'superclasse') vocabularyScanner classNamesScanReport ] ].
+								each vocabularyScanner classNamesScanReport ]) from: #yourself to: [ :aClassScanReport| (aClassScanReport at: 'superclasse') ifNotNil: [ (aClassScanReport at: 'superclasse') vocabularyScanner classNamesScanReport ] ]."]"
 	
 	Transcript show: (Time now asSeconds - delay asSeconds )asString;cr.
 	
