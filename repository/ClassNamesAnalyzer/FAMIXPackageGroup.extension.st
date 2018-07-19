@@ -16,7 +16,11 @@ FAMIXPackageGroup >> scanClassNames [
 
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXPackageGroup >> vocabularyScanner [
-	^self privateState attributeAt: #vocabularyScanner ifAbsentPut: (FAMIXPackagesGroupScanner scan: self)
+|a|
+a := 
+	self privateState attributeAt: #vocabularyScanner ifAbsentPut: (nil).
+	a ifNil: [ a := (self privateState attributeAt: #vocabularyScanner put: (FAMIXPackagesGroupScanner scan: self)) value ].
+	^a
 ]
 
 { #category : #'*ClassNamesAnalyzer' }

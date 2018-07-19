@@ -26,7 +26,11 @@ FAMIXPackage >> viewInClassBluePrint [
 
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXPackage >> vocabularyScanner [
-	^ self privateState attributeAt: #vocabularyScanner ifAbsentPut: (FAMIXPackageScanner scan: self)
+|a|
+a := 
+	self privateState attributeAt: #vocabularyScanner ifAbsentPut: (nil).
+	a ifNil: [ a := (self privateState attributeAt: #vocabularyScanner put: (FAMIXPackageScanner scan: self)) value ].
+	^a
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
