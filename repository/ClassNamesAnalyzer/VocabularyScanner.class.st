@@ -60,19 +60,21 @@ VocabularyScanner >> allClassNameSuffixesSorted: suffixScanReports [
 
 { #category : #Visualizations }
 VocabularyScanner >> classBluePrint [
-		| b sortedRootClasses dictionaryOfColors delay |
+		| b sortedRootClasses  delay |
 	^classNamesScanReport at: 'classBlueprint' ifAbsentPut:[ 	b := RTMondrian new.
 			delay:=Time now.
 			
 	"TimeProfiler spyOn:["sortedRootClasses := (self classNamesScanReport
 		at: 'allRootClassesSortedByNumberOfSubClasses') collect: #value.
-	dictionaryOfColors := self classNamesScanReport
-		at: 'colorsOfRootClasses'.
+	"dictionaryOfColors := self classNamesScanReport
+		at: 'colorsOfRootClasses'."
 	b shape rectangle withTextAbove.
+	b shape color: [ :each| Color white ];
+	borderColor: [ :aPackage| Color gray ] .
 	b
 		nodes: self scannedPackages
 		forEach: [ :aSinglePackage | 
-			| aSinglePackageScanReport |
+			| aSinglePackageScanReport sortedSuffixes unSortedSuffixes |
 			aSinglePackageScanReport := aSinglePackage vocabularyScanner
 				classNamesScanReport.
 			b shape rectangle.
@@ -85,18 +87,29 @@ VocabularyScanner >> classBluePrint [
 						self dictionaryOfColors ifNil:[
 							self scannedEntities mooseModel allPackages scanClassNames
 							].
-					self dictionaryOfColors at: dominantClasse ];
-				withTextAbove: [:each| each value suffix].
+						Transcript show: 'taile du dictionnaire des couleur: ',self dictionaryOfColors size asString,String cr.
+					(self dictionaryOfColors at: dominantClasse) alpha: ((aSuffix value dominantHierarchieInPackages select: [ :each| each value >= aSuffix value dominanceLevel ]) size / aSuffix value dominantHierarchieInPackages size) ];
+				withTextAbove: [:each| each value suffix];
+				borderWidth: 2.
+							b shape borderColor: [  :aSuffix | 
+					| dominantClasse |
+					dominantClasse := ((self groupOfPackagesScanReport
+						at: 'dominantRootsInSuffix') at: aSuffix value suffix) first value.
+					(self dictionaryOfColors at: dominantClasse)  ] .
+unSortedSuffixes := (self groupOfPackagesScanReport at: 'allClassNameSuffixesSorted') select: [ :association| association value packages includes: aSinglePackageScanReport scannedEntity ]  .
+"sortedSuffixes := sortedSuffixes sort: [ :first :second | (first value dominantHierarchie key first = second value dominantHierarchie key first) and: ].
+"
+sortedSuffixes := aSinglePackageScanReport sortSuffixes: unSortedSuffixes.
 			b
-				nodes: ((self groupOfPackagesScanReport at: 'allClassNameSuffixesSorted') select: [ :association| association value packages includes: aSinglePackageScanReport scannedEntity ]  )
+				nodes: sortedSuffixes
 				forEach: [ :suffix | 
+					
 					b shape rectangle.
 					b shape
 						size:
 							[ :aClassScanReport | 50 / ((aClassScanReport at: 'superclassesInCurrentPackage') size + 1) ].
 					b shape
 						color: [ :aClassScanReport | 
-						"self halt."
 							 self dictionaryOfColors at: (aClassScanReport at: 'rootClass')  ];
 						borderColor: [ :aClassScanReport | 
 							(aClassScanReport at: 'className')
@@ -149,6 +162,7 @@ VocabularyScanner >> definedMetrics [
 
 { #category : #'instance-creation' }
 VocabularyScanner >> dictionaryOfColors [
+
 	^self scannedEntities mooseModel dictionaryOfRootClassColors
 ]
 
