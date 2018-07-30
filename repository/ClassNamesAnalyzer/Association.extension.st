@@ -10,3 +10,10 @@ Association >> mouseAnnouncer [
 Association >> viewInClassBluePrint [
 	^value
 ]
+
+{ #category : #'*ClassNamesAnalyzer' }
+Association >> viewInMooseIn: composite [
+	<gtInspectorPresentationOrder: -10>
+	<moosePresentationOrder: -20>
+	value viewInMooseIn: composite
+]

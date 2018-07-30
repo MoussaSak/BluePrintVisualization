@@ -81,10 +81,12 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 		at: 'allRootClassesAsaSet' put: [ :aGroupOfScanReports | (self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClassesSortedByNumberOfSubClasses') value: aGroupOfScanReports] ) collect: #value ];
 		
 		at: 'colorsOfRootClasses' put: [ :aGroupOfScanReports | 
-			|aDictionaryOfColors i|
+			self scannedEntities mooseModel dictionaryOfRootClassColors ifNil:
+			[|aDictionaryOfColors i|
 			i := 0.
 			aDictionaryOfColors := Dictionary new.
-			(self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClassesSortedByNumberOfSubClasses') value: aGroupOfScanReports] ) do: [ :aRootClass| aRootClass value isMetaRoot ifTrue: [aDictionaryOfColors at: aRootClass value put: (Color gray: 1) ] ifFalse: [ i:= i+1. aDictionaryOfColors at: aRootClass value put: (self pickAnAvailableColorNumber: i) ]. self saveInMooseModel: aDictionaryOfColors ]];
+			
+			(self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClassesSortedByNumberOfSubClasses') value: aGroupOfScanReports] ) do: [ :aRootClass| aRootClass value isMetaRoot ifTrue: [aDictionaryOfColors at: aRootClass value put: (Color gray: 1) ] ifFalse: [ i:= i+1. aDictionaryOfColors at: aRootClass value put: (self pickAnAvailableColorNumber: i) ]. self saveInMooseModel: aDictionaryOfColors ]]];
 		
 		yourself
 ]
