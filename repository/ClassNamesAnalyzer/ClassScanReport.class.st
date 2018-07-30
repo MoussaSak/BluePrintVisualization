@@ -40,7 +40,7 @@ b nodes: allPackages forEach: [
 
 	b nodes: (allHierarchyClasses select: [ :aReport | (aReport at: 'package') = aPackage ] ).
 	b layout tree.
-	b view elements do:[:element| element @ (RTMouseHoverZoom new desiredExtent: [ :anElement | anElement extent * 1.7 ])].
+	
 	b edges connectFrom: [ :each|
 	 (each at: 'superclasse') vocabularyScanner classNamesScanReport]
 	].
