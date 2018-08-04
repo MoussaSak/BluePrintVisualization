@@ -87,7 +87,6 @@ VocabularyScanner >> classBluePrint [
 						self dictionaryOfColors ifNil:[
 							self scannedEntities mooseModel allPackages scanClassNames
 							].
-						Transcript show: 'taile du dictionnaire des couleur: ',self dictionaryOfColors size asString,String cr.
 					(self dictionaryOfColors at: dominantClasse) alpha: ((aSuffix value dominantHierarchieInPackages select: [ :each| each value >= aSuffix value dominanceLevel ]) size / aSuffix value dominantHierarchieInPackages size) ];
 				withTextAbove: [:each| each value suffix];
 				borderWidth: 2.

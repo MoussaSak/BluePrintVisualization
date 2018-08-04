@@ -9,6 +9,21 @@ FAMIXClass >> allSubInheritances [
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
+FAMIXClass >> classNamesScanReport [
+	^self vocabularyScanner classNamesScanReport.
+]
+
+{ #category : #'*ClassNamesAnalyzer' }
+FAMIXClass >> indiceOfTheClassInHierarchy [
+	^self classNamesScanReport indiceOfTheClassInHierarchy.
+]
+
+{ #category : #'*classNamesAnalyzer' }
+FAMIXClass >> indiceOfTheClassInSubHierarchy [
+	^self vocabularyScanner classNamesScanReport indiceOfTheClassInSubHierarchy.
+]
+
+{ #category : #'*ClassNamesAnalyzer' }
 FAMIXClass >> isMetaRoot [
 	^self nameSuffix = 'Object'
 ]
