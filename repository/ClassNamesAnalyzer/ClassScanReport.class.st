@@ -25,6 +25,11 @@ ClassScanReport >> affectRandomColorsTo: subRootClasses [
 	^dicoOfColors
 ]
 
+{ #category : #queries }
+ClassScanReport >> allHierarchySuffixes [
+	^self classesGroupedBySuffixesAndSubhierarchies keys.
+]
+
 { #category : #'visualization-private' }
 ClassScanReport >> buildHierarchyBlueprintOf: aDicoOfSuffixesAndSubhierarchies using: dicoOfColors and: dicoOfVisualElementsIndices [
 	| view allHierarchieClasses aDicoOfSuffixesAndClasses layers |
