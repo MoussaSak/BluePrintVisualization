@@ -27,7 +27,7 @@ ClassScanReport >> affectRandomColorsTo: subRootClasses [
 
 { #category : #queries }
 ClassScanReport >> allHierarchySuffixes [
-	^self classesGroupedBySuffixesAndSubhierarchies keys.
+	^(self at: 'rootClass') classNamesScanReport hierarchieSuffixesAndClasses keys
 ]
 
 { #category : #'visualization-private' }
@@ -56,6 +56,17 @@ ClassScanReport >> classReportViewIn: composite [
 		title: 'NameBlueprint';
 		initializeView: [ self hierarchicalVisualisationWithCouleredSuffixes]
 
+]
+
+{ #category : #queries }
+ClassScanReport >> classesGroupedBySuffixes [
+	| classes aCollection aDico |
+	classes := self classesGroupedBySuffixesAndSubhierarchies.
+	aCollection := OrderedCollection new.
+	aDico := Dictionary new.
+	classes keys
+		do: [ :aSuffix | aDico at: aSuffix put: ((classes at: aSuffix) values flatCollect: #yourself) ].
+	^aDico
 ]
 
 { #category : #queries }

@@ -24,6 +24,56 @@ FAMIXPackagesGroupScanner class >> scan: aFAMIXPackageGroup [
 	^super scan: aFAMIXPackageGroup 
 ]
 
+{ #category : #queries }
+FAMIXPackagesGroupScanner >> allCoherentHierarchies [
+	^self allHierarchies select: [:each | each allHierarchySuffixes size = 1].
+]
+
+{ #category : #queries }
+FAMIXPackagesGroupScanner >> allCoherentSuffixes [
+	^self allSuffixes select: [ :each | each value hierarchies asSet size = 1 ]
+]
+
+{ #category : #queries }
+FAMIXPackagesGroupScanner >> allHierarchies [
+	^(self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses') collect: [ :each | each value classNamesScanReport ].
+]
+
+{ #category : #queries }
+FAMIXPackagesGroupScanner >> allInCoherentSuffixes [
+	^self allSuffixes select:  [ :each| each value hierarchies asSet size > 1 ]
+]
+
+{ #category : #queries }
+FAMIXPackagesGroupScanner >> allIncoherentHierarchies [
+	^self allHierarchies select: [:each | each allHierarchySuffixes size > 1].
+]
+
+{ #category : #queries }
+FAMIXPackagesGroupScanner >> allMultiClassCoherentHierarchies [
+	^self allMultiClassHierarchies select: [ :each| each allHierarchySuffixes size = 1 ]
+]
+
+{ #category : #queries }
+FAMIXPackagesGroupScanner >> allMultiClassCoherentSuffixes [
+	^self allMultiClassSuffixes select: [ :each| each value hierarchies asSet size = 1 ]
+]
+
+{ #category : #queries }
+FAMIXPackagesGroupScanner >> allMultiClassHierarchies [
+	^self allHierarchies select: [ :each | each scannedEntity allSubInheritances size >= 1 ]
+]
+
+{ #category : #queries }
+FAMIXPackagesGroupScanner >> allMultiClassSuffixes [
+	^self allSuffixes select: [ :each | each key > 1 ]
+]
+
+{ #category : #queries }
+FAMIXPackagesGroupScanner >> allSuffixes [
+	^self classNamesScanReport at: 'allClassNameSuffixesSorted'.
+]
+
 { #category : #'instance-creation' }
 FAMIXPackagesGroupScanner >> defaultMetrics [
 	^ Dictionary new
@@ -89,6 +139,27 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 			(self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClassesSortedByNumberOfSubClasses') value: aGroupOfScanReports] ) do: [ :aRootClass| aRootClass value isMetaRoot ifTrue: [aDictionaryOfColors at: aRootClass value put: (Color gray: 1) ] ifFalse: [ i:= i+1. aDictionaryOfColors at: aRootClass value put: (self pickAnAvailableColorNumber: i) ]. self saveInMooseModel: aDictionaryOfColors ]]];
 		
 		yourself
+]
+
+{ #category : #'instance-creation' }
+FAMIXPackagesGroupScanner >> generateSVNFor: aProject [
+	| aString |
+	aString := 'Project : ;', aProject,
+	String cr,
+	'numberOfSuffixes ;', self allSuffixes size asString,
+	String cr,
+	'numberOfCoherentSuffixes ;', self allCoherentSuffixes size asString,
+	String cr,
+	'numberOfMultiClassSuffixes ;', self allMultiClassSuffixes size asString,
+	String cr,
+	'numberOfMultiClassCoherentSuffixes ;', self allMultiClassCoherentSuffixes size asString,
+	(String cr;cr),
+	'numberOfHierarchies :', self allHierarchies size asString,
+	String cr,
+	'numberOfCoherentHierarchies : ', self allCoherentHierarchies size asString,
+	String cr,
+	'numberOfMultiClassHierarchies: ', self allMultiClassHierarchies size asString,
+	'numberOfMultiClassCoherentHierarchies: ', self allMultiClassCoherentHierarchies size asString
 ]
 
 { #category : #accessing }
