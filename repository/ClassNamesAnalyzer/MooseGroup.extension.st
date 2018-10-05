@@ -1,7 +1,7 @@
-Extension { #name : #FAMIXPackageGroup }
+Extension { #name : #MooseGroup }
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXPackageGroup >> packageViewIn: composite [
+MooseGroup >> packageViewIn: composite [
 	<gtInspectorPresentationOrder: -10>
 	<moosePresentationOrder: -20>
 	composite roassal2
@@ -10,12 +10,12 @@ FAMIXPackageGroup >> packageViewIn: composite [
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXPackageGroup >> scanClassNames [
+MooseGroup >> scanClassNames [
 	^FAMIXPackagesGroupScanner scan: self.
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXPackageGroup >> vocabularyScanner [
+MooseGroup >> vocabularyScanner [
 |a|
 a := 
 	self privateState attributeAt: #vocabularyScanner ifAbsentPut: (nil).
@@ -24,6 +24,6 @@ a :=
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXPackageGroup >> vocabularyScanner: aFAMIXPackagesGroupScanner [ 
+MooseGroup >> vocabularyScanner: aFAMIXPackagesGroupScanner [ 
 	self privateState attributeAt: #vocabularyScanner put: aFAMIXPackagesGroupScanner
 ]

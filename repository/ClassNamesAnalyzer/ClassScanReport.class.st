@@ -276,6 +276,31 @@ ClassScanReport >> orderSuffixesAccordingToLongestSubHierarchy: aDicoOfSuffixesA
 			firstSuffixIndiceOfClasses > secondSuffixIndiceOfClasses ]
 ]
 
+{ #category : #storage }
+ClassScanReport >> saveClassNameInformationTo: aMultiByteFileStream [ 
+	aMultiByteFileStream << (self at: 'className') << ';'
+	<< ((self at: 'rootClass') name) << ';'
+	<< (self at: 'CLASSNAME_usesSameSuffixeAsRoot') << ';'
+	<< (self at: 'CLASSNAME_isFalsePositive') << ';'
+	<< (self at: 'CLASSNAME_isNamedConsistently') << ';'
+	<< (self at: 'CLASSNAME_noteOnCoherence' ) << ';'
+	<< (self at: 'CLASSNAME_canBeFixedConformingToUnicityHypothesis').
+	aMultiByteFileStream crlf.
+	
+" CLASSNAME_usesAdifferentSuffixeThanRoot;CLASSNAME_isFalsePositive;CLASSNAME_isNamedInconsistently;CLASSNAME_noteOnCoherence;CLASSNAME_canBeFixedConformingToUnicityHypothesis"
+]
+
+{ #category : #storage }
+ClassScanReport >> saveTo: aMultiByteFileStream [ 
+	aMultiByteFileStream << (self at: 'className') << ';'
+	<< (self at: 'HIERARHCY_usesManySuffixes') << ';'
+	<< (self at: 'HIERARHCY_isFalsePositive') << ';'
+	<< (self at: 'HIERARHCY_isNamedInconsistently') << ';'
+	<< (self at: 'HIERARHCY_noteOnCoherence' ) << ';'
+	<< (self at: 'HIERARHCY_canBeFixedConformingToUnicityHypothesis').
+	aMultiByteFileStream crlf
+]
+
 { #category : #accessing }
 ClassScanReport >> scannedClass [
 	^self at: 'scannedClasses'.

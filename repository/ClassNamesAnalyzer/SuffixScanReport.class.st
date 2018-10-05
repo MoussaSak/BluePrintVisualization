@@ -217,6 +217,17 @@ SuffixScanReport >> resetPackages [
 	packages := nil
 ]
 
+{ #category : #exporting }
+SuffixScanReport >> saveTo: aMultiByteFileStream [ 
+	aMultiByteFileStream << (self at: 'suffix:') << ';'
+	<< (self at: 'isUsedInManyHierarchies') << ';'
+	<< (self at: 'isFalsePositive') << ';'
+	<< (self at: 'isTrueAmbiguous') << ';'
+	<< (self at: 'note' ) << ';'
+	<< (self at: 'canBeFixedConformingToUnicityHypothesis').
+	aMultiByteFileStream crlf
+]
+
 { #category : #visualization }
 SuffixScanReport >> simpleGridLayoutVisualisation [
 |b|
