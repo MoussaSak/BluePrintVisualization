@@ -1,12 +1,12 @@
-Extension { #name : #FAMIXPackage }
+Extension { #name : #FAMIXScopingEntity }
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXPackage >> mouseAnnouncer [
+FAMIXScopingEntity >> mouseAnnouncer [
 	^RTPopup new text: self viewInClassBluePrint
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXPackage >> packageViewIn: composite [
+FAMIXScopingEntity >> packageViewIn: composite [
 	<gtInspectorPresentationOrder: -10>
 	<moosePresentationOrder: -20>
 	composite roassal2
@@ -15,17 +15,17 @@ FAMIXPackage >> packageViewIn: composite [
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXPackage >> scanClassNames [
+FAMIXScopingEntity >> scanClassNames [
 	^FAMIXPackageScanner scan: self
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXPackage >> viewInClassBluePrint [
+FAMIXScopingEntity >> viewInClassBluePrint [
 	^'package Name: ', (self vocabularyScanner classNamesScanReport at: 'packageName') asString
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXPackage >> vocabularyScanner [
+FAMIXScopingEntity >> vocabularyScanner [
 |a|
 a := 
 	self privateState attributeAt: #vocabularyScanner ifAbsentPut: (nil).
@@ -34,6 +34,6 @@ a :=
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXPackage >> vocabularyScanner: aFAMIXClassScanner [ 
+FAMIXScopingEntity >> vocabularyScanner: aFAMIXClassScanner [ 
 	self privateState attributeAt: #vocabularyScanner put: aFAMIXClassScanner.
 ]

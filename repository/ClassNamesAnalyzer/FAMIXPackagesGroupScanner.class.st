@@ -36,7 +36,7 @@ FAMIXPackagesGroupScanner >> allCoherentSuffixes [
 
 { #category : #queries }
 FAMIXPackagesGroupScanner >> allHierarchies [
-	^(self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses') collect: [ :each | each value classNamesScanReport ].
+	^((self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses') reject: [ :each | each value classNamesScanReport at: 'isMetaRoot']) collect: [ :each | each value classNamesScanReport ].
 ]
 
 { #category : #queries }
@@ -142,24 +142,59 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 ]
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner >> generateSVNFor: aProject [
-	| aString |
-	aString := 'Project : ;', aProject,
-	String cr,
-	'numberOfSuffixes ;', self allSuffixes size asString,
-	String cr,
-	'numberOfCoherentSuffixes ;', self allCoherentSuffixes size asString,
-	String cr,
-	'numberOfMultiClassSuffixes ;', self allMultiClassSuffixes size asString,
-	String cr,
-	'numberOfMultiClassCoherentSuffixes ;', self allMultiClassCoherentSuffixes size asString,
-	(String cr;cr),
-	'numberOfHierarchies :', self allHierarchies size asString,
-	String cr,
-	'numberOfCoherentHierarchies : ', self allCoherentHierarchies size asString,
-	String cr,
-	'numberOfMultiClassHierarchies: ', self allMultiClassHierarchies size asString,
-	'numberOfMultiClassCoherentHierarchies: ', self allMultiClassCoherentHierarchies size asString
+FAMIXPackagesGroupScanner >> generateCSVFor: aProject [
+	| stream anOutputFileName |
+	
+	anOutputFileName := aProject, Date today yyyymmdd, Time now hhmm24,'.txt'.
+	[ stream := anOutputFileName asFileReference writeStream.
+	stream setToEnd.
+	stream << 'Project '<< ';' << aProject.
+	stream crlf.
+	stream << 'numberOfSuffixes'<< ';' << self allSuffixes size asString.
+	stream crlf.
+	stream << 'numberOfCoherentSuffixes'<< ';' << self allCoherentSuffixes size asString.
+	stream crlf.
+	stream << 'numberOfMultiClassSuffixes'<< ';' << self allMultiClassSuffixes size asString.
+	stream crlf.
+	stream << 'numberOfMultiClassCoherentSuffixes'<< ';' << self allMultiClassCoherentSuffixes size asString.
+	stream crlf.stream crlf.
+	stream << 'numberOfHierarchies'<< ';' << self allHierarchies size asString.
+	stream crlf.
+	stream << 'numberOfCoherentHierarchies'<< ';' << self allCoherentHierarchies size asString.
+	stream crlf.
+	stream << 'numberOfMultiClassHierarchies'<< ';' << self allMultiClassHierarchies size asString.
+	stream crlf.
+	stream << 'numberOfMultiClassCoherentHierarchies'<< ';' << self allMultiClassCoherentHierarchies size asString.
+	stream crlf.
+	] ensure:[stream close].
+
+anOutputFileName := aProject, 'SuffixReport', Date today yyyymmdd, '_', Time now hhmm24,'.txt'.
+	[ stream := anOutputFileName asFileReference writeStream.
+	stream setToEnd.
+	stream << 'suffix;isUsedInManyHierarchies;isFalsePositive;isTrueAmbiguous;note;canBeFixedConformingToUnicityHypothesis'.
+	stream crlf.
+self allSuffixes do: [ :aSuffixScanReport| 
+		aSuffixScanReport value saveTo: stream].
+	] ensure:[stream close].
+
+"anOutputFileName := aProject, 'HierarchiesReport', Date today yyyymmdd, '_', Time now hhmm24,'.txt'.
+	[ stream := anOutputFileName asFileReference writeStream.
+	stream setToEnd.
+	stream << 'Hierarchy;HIERARHCY_usesManySuffixes;HIERARHCY_isFalsePositive;HIERARHCY_isNamedInconsistently;HIERARHCY_noteOnCoherence;HIERARHCY_canBeFixedConformingToUnicityHypothesis'.
+	stream crlf.
+self allHierarchies do: [ :aHierarchyScanReport| 
+		aHierarchyScanReport value saveTo: stream].
+	] ensure:[stream close].
+"
+anOutputFileName := aProject, 'ClassesReport', Date today yyyymmdd, '_', Time now hhmm24,'.txt'.
+	[ stream := anOutputFileName asFileReference writeStream.
+	stream setToEnd.
+	stream << 'ClassName;HierarchyName; CLASSNAME_usesSameSuffixeAsRoot;CLASSNAME_isFalsePositive;CLASSNAME_isNamedConsistently;CLASSNAME_noteOnCoherence;CLASSNAME_canBeFixedConformingToUnicityHypothesis'.
+	stream crlf.
+(self classNamesScanReport at: 'allClasses') do: [ :aClass| 
+		(aClass classNamesScanReport at: 'isMetaRoot') ifFalse: [aClass classNamesScanReport saveClassNameInformationTo: stream]].
+	] ensure:[stream close].
+
 ]
 
 { #category : #accessing }
