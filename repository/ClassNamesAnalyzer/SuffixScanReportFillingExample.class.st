@@ -38,10 +38,11 @@ self allCoherentSuffixes do: [:each | each value
 	at: 'canBeFixedConformingToUnicityHypothesis' put: '' 
 	].
 
+"then expect the following:"
 self allInCoherentSuffixes do: [:each | each value 
 	at: 'suffix:' put: each value suffix;
 	at: 'isUsedInManyHierarchies' put: 'YES'].
-
+"and in the new window, click on each suffixReport then evaluate the correct expression between brackets (without the brackets)"
 [self value 
 	at: 'isFalsePositive' put: 'GeneralTerm_Actor';
 	at: 'isTrueAmbiguous' put: 'NO';
