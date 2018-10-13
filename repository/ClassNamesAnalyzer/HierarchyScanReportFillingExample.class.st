@@ -25,37 +25,6 @@ associations do: [:each | each value
 ]
 
 { #category : #'as yet unclassified' }
-HierarchyScanReportFillingExample >> example2 [
-"Where self is aFAMIXPAckageGroupScanner :) "
-self allCoherentHierarchies do: [:aHierarchy| aHierarchy classesGroupedBySuffixes do: [ :suffixAndClasses|
-	suffixAndClasses do: [ :each|
-	each at: 'CLASSNAME_usesAdifferentSuffixeThanRoot' put: 'NO'.
-	each at: 'CLASSNAME_isFalsePositive' put: ''. 
-	each at: 'CLASSNAME_isNamedInconsistently' put: ''.
-	each at: 'CLASSNAME_noteOnCoherence' put: ''.
-	each at: 'CLASSNAME_canBeFixedConformingToUnicityHypothesis' put: '' ] ] ].
-
-self allIncoherentHierarchies do: [:aHierarchy|
-	(aHierarchy classesGroupedBySuffixes at: aHierarchy suffix) do: [ :each|
-	each at: 'CLASSNAME_usesAdifferentSuffixeThanRoot' put: 'NO'.
-	each at: 'CLASSNAME_isFalsePositive' put: ''. 
-	each at: 'CLASSNAME_isNamedInconsistently' put: ''.
-	each at: 'CLASSNAME_noteOnCoherence' put: ''.
-	each at: 'CLASSNAME_canBeFixedConformingToUnicityHypothesis' put: '' . ]
-].
-"edit it one by one"
-((self classNamesScanReport at: 'allClasses') collect: [ :each | (each classNamesScanReport at: 'isMetaRoot') ifFalse: [each classNamesScanReport at: 'CLASSNAME_usesAdifferentSuffixeThanRoot'] ]) asSet.
-self allHierarchies do: [  :each|
-	each at: 'CLASSNAME_usesAdifferentSuffixeThanRoot' put: ''.
-	each at: 'CLASSNAME_isFalsePositive' put: ''. 
-	each at: 'CLASSNAME_isNamedInconsistently' put: ''.
-	each at: 'CLASSNAME_noteOnCoherence' put: 'Root'.
-	each at: 'CLASSNAME_canBeFixedConformingToUnicityHypothesis' put: '' ].
-
-self generateCSVFor: 'reports/Roassal'
-]
-
-{ #category : #'as yet unclassified' }
 HierarchyScanReportFillingExample >> example3 [ 
 "Where self is a FAMIXPackagesGroupScanner"
 self allHierarchies
@@ -76,8 +45,57 @@ self allHierarchies
 	aHierarchy at: 'CLASSNAME_isNamedConsistently' put: ''.	
 		aHierarchy at: 'CLASSNAME_noteOnCoherence' put: 'Root'
 						].
-	self allIncoherentHierarchies 				
-				
+	"then inspect the following :"
+	self allIncoherentHierarchies. 	
+		"and in the new window, click on each HierarchyReport then evaluate the correct expression between brackets (without the brackets)" 
+					
+	[self classesGroupedBySuffixes 
+		do: [ :suffixAndClasses | 
+			(suffixAndClasses first at: 'classSuffix') = (self at: 'classSuffix') ifFalse: [
+			suffixAndClasses
+	do: [ :each | 
+	each at: 'CLASSNAME_usesSameSuffixeAsRoot' put: 'NO'.
+	each at: 'CLASSNAME_isFalsePositive' put: 'Specialization'.
+	each at: 'CLASSNAME_isNamedConsistently' put: 'YES'.
+	each at: 'CLASSNAME_noteOnCoherence' put: ''.
+	each at: 'CLASSNAME_canBeFixedConformingToUnicityHypothesis' put: '' ] ]]].
+
+[ self classesGroupedBySuffixes 
+		do: [ :suffixAndClasses | 
+			(suffixAndClasses first at: 'classSuffix') = (self at: 'classSuffix') ifFalse: [
+			suffixAndClasses
+	do: [ :each | 
+	each at: 'CLASSNAME_usesSameSuffixeAsRoot' put: 'NO'.
+	each at: 'CLASSNAME_isFalsePositive' put: 'NO'.
+	each at: 'CLASSNAME_isNamedConsistently' put: 'NO'.
+	each at: 'CLASSNAME_noteOnCoherence' put: 'Improper suffix dropping'.
+	each at: 'CLASSNAME_canBeFixedConformingToUnicityHypothesis' put: 'YES' ] ]] ].
+			
+[self classesGroupedBySuffixes 
+		do: [ :suffixAndClasses | 
+			(suffixAndClasses first at: 'classSuffix') = (self at: 'classSuffix') ifFalse: [
+			suffixAndClasses
+				do: [ :each | 
+					each at: 'CLASSNAME_usesSameSuffixeAsRoot' put: 'NO'.
+					each at: 'CLASSNAME_isFalsePositive' put: 'NO'.
+					each at: 'CLASSNAME_isNamedConsistently' put: 'NO'.
+					each at: 'CLASSNAME_noteOnCoherence' put: 'OLD CLass may be should be removed or renamed'.
+					each
+						at: 'CLASSNAME_canBeFixedConformingToUnicityHypothesis'
+						put: 'YES' ] ]]].
+		
+[self classesGroupedBySuffixes 
+		do: [ :suffixAndClasses | 
+			false ifFalse: [
+			suffixAndClasses
+				do: [ :each | 
+					each at: 'CLASSNAME_usesSameSuffixeAsRoot' put: 'UNKNOWN'.
+					each at: 'CLASSNAME_isFalsePositive' put: 'UNKNOWN'.
+					each at: 'CLASSNAME_isNamedConsistently' put: 'UNKNOWN'.
+					each at: 'CLASSNAME_noteOnCoherence' put: 'UNKNOWN'.
+					each
+						at: 'CLASSNAME_canBeFixedConformingToUnicityHypothesis'
+						put: 'UNKNOWN' ] ]]]			
 			self generateCSVFor: 'Reports/Calypso'
 
 ]
