@@ -30,7 +30,7 @@ SuffixScanReportFillingExample >> example2 [
 "Where self is aFAMIXPAckageGroupScanner :) "
 
 self allCoherentSuffixes do: [:each | each value 
-	at: 'suffix:' put: self value suffix;
+	at: 'suffix:' put: each value suffix;
 	at: 'isUsedInManyHierarchies' put: 'NO'; 
 	at: 'isFalsePositive' put: ''; 
 	at: 'isTrueAmbiguous' put: ''; 
@@ -38,10 +38,13 @@ self allCoherentSuffixes do: [:each | each value
 	at: 'canBeFixedConformingToUnicityHypothesis' put: '' 
 	].
 
+self allInCoherentSuffixes do: [:each | each value 
+	at: 'suffix:' put: each value suffix;
+	at: 'isUsedInManyHierarchies' put: 'YES'].
+
 [self value 
 	at: 'isFalsePositive' put: 'GeneralTerm_Actor';
 	at: 'isTrueAmbiguous' put: 'NO';
-
 	at: 'note' put: 'Verb+ER/OR';
 	at: 'canBeFixedConformingToUnicityHypothesis' put: '';
 	at: 'others' put: ''.

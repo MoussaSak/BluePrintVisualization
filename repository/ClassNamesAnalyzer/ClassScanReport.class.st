@@ -94,7 +94,7 @@ ClassScanReport >> createEdgesFor: aClass on: view [
 	eb view: view.
 	eb shape line width: 0.1; color: (aClass indiceOfTheClassInHierarchy = 1 
 	ifTrue: Color transparent ifFalse: ((Color black adjustBrightness: -0.1) alpha: 0.1)).
-	eb connectFrom: aClass  to: (aClass at: 'superclasse') classNamesScanReport  
+	eb connectFrom: aClass  to: ((aClass at: 'superclasse') ifNotNil: [(aClass at: 'superclasse') classNamesScanReport])  
 ]
 
 { #category : #'visualization-private' }
