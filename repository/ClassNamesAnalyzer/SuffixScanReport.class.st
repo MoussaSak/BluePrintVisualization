@@ -77,7 +77,7 @@ SuffixScanReport >> dominantHierarchieInPackages [
 	^dominantHierarchieInPackages ifNil:
 	[associationsOfPackagesAndHierarchies := classScanReports asBag collect: [ :each| (each at: 'package')->(each at: 'rootClass') ].
 	numberOfclassesBelongingToDominantHierarchy := (associationsOfPackagesAndHierarchies select: [ :each| each value = self dominantHierarchie key first]).
-	dominantHierarchieInPackages := packages collect: [:each| each -> ((numberOfclassesBelongingToDominantHierarchy select: [:ass| ass key = each ]) size / (classScanReports select: [ :report| (report at: 'package') = each]) size) ]]
+	dominantHierarchieInPackages := self packages collect: [:each| each -> ((numberOfclassesBelongingToDominantHierarchy select: [:ass| ass key = each ]) size / (classScanReports select: [ :report| (report at: 'package') = each]) size) ]]
 ]
 
 { #category : #accessing }
@@ -219,7 +219,7 @@ SuffixScanReport >> resetPackages [
 
 { #category : #exporting }
 SuffixScanReport >> saveTo: aMultiByteFileStream [ 
-	aMultiByteFileStream << (self at: 'suffix:') << ';'
+	aMultiByteFileStream << (self suffix) << ';'
 	<< (self at: 'isUsedInManyHierarchies') << ';'
 	<< (self at: 'isFalsePositive') << ';'
 	<< (self at: 'isTrueAmbiguous') << ';'

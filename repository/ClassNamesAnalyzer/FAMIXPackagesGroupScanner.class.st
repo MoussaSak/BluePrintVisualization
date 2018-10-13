@@ -141,7 +141,7 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 		yourself
 ]
 
-{ #category : #'instance-creation' }
+{ #category : #storage }
 FAMIXPackagesGroupScanner >> generateCSVFor: aProject [
 	| stream anOutputFileName |
 	
@@ -168,15 +168,7 @@ FAMIXPackagesGroupScanner >> generateCSVFor: aProject [
 	stream crlf.
 	] ensure:[stream close].
 
-anOutputFileName := aProject, 'SuffixReport', Date today yyyymmdd, '_', Time now hhmm24,'.txt'.
-	[ stream := anOutputFileName asFileReference writeStream.
-	stream setToEnd.
-	stream << 'suffix;isUsedInManyHierarchies;isFalsePositive;isTrueAmbiguous;note;canBeFixedConformingToUnicityHypothesis'.
-	stream crlf.
-self allSuffixes do: [ :aSuffixScanReport| 
-		aSuffixScanReport value saveTo: stream].
-	] ensure:[stream close].
-
+	self generateCSVSuffixReportFor: aProject.
 "anOutputFileName := aProject, 'HierarchiesReport', Date today yyyymmdd, '_', Time now hhmm24,'.txt'.
 	[ stream := anOutputFileName asFileReference writeStream.
 	stream setToEnd.
@@ -186,13 +178,35 @@ self allHierarchies do: [ :aHierarchyScanReport|
 		aHierarchyScanReport value saveTo: stream].
 	] ensure:[stream close].
 "
-anOutputFileName := aProject, 'ClassesReport', Date today yyyymmdd, '_', Time now hhmm24,'.txt'.
+	self generateCSVHierarchyFor: aProject.
+
+]
+
+{ #category : #storage }
+FAMIXPackagesGroupScanner >> generateCSVHierarchyFor: aProject [
+	| anOutputFileName stream |
+	anOutputFileName := aProject, 'ClassesReport', Date today yyyymmdd, '_', Time now hhmm24,'.txt'.
 	[ stream := anOutputFileName asFileReference writeStream.
 	stream setToEnd.
 	stream << 'ClassName;HierarchyName; CLASSNAME_usesSameSuffixeAsRoot;CLASSNAME_isFalsePositive;CLASSNAME_isNamedConsistently;CLASSNAME_noteOnCoherence;CLASSNAME_canBeFixedConformingToUnicityHypothesis'.
 	stream crlf.
 (self classNamesScanReport at: 'allClasses') do: [ :aClass| 
 		(aClass classNamesScanReport at: 'isMetaRoot') ifFalse: [aClass classNamesScanReport saveClassNameInformationTo: stream]].
+	] ensure:[stream close].
+
+]
+
+{ #category : #storage }
+FAMIXPackagesGroupScanner >> generateCSVSuffixReportFor: aProject [
+	| stream anOutputFileName |
+	
+	anOutputFileName := aProject, 'SuffixReport', Date today yyyymmdd, '_', Time now hhmm24,'.txt'.
+	[ stream := anOutputFileName asFileReference writeStream.
+	stream setToEnd.
+	stream << 'suffix;isUsedInManyHierarchies;isFalsePositive;isTrueAmbiguous;note;canBeFixedConformingToUnicityHypothesis'.
+	stream crlf.
+self allSuffixes do: [ :aSuffixScanReport| 
+		aSuffixScanReport value saveTo: stream].
 	] ensure:[stream close].
 
 ]

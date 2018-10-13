@@ -1,27 +1,8 @@
 Extension { #name : #FAMIXScopingEntity }
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXScopingEntity >> mouseAnnouncer [
-	^RTPopup new text: self viewInClassBluePrint
-]
-
-{ #category : #'*ClassNamesAnalyzer' }
-FAMIXScopingEntity >> packageViewIn: composite [
-	<gtInspectorPresentationOrder: -10>
-	<moosePresentationOrder: -20>
-	composite roassal2
-		title: 'NameBlueprint';
-		initializeView: [ self vocabularyScanner classBluePrint]
-]
-
-{ #category : #'*ClassNamesAnalyzer' }
 FAMIXScopingEntity >> scanClassNames [
 	^FAMIXPackageScanner scan: self
-]
-
-{ #category : #'*ClassNamesAnalyzer' }
-FAMIXScopingEntity >> viewInClassBluePrint [
-	^'package Name: ', (self vocabularyScanner classNamesScanReport at: 'packageName') asString
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
