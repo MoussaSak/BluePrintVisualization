@@ -17,7 +17,7 @@ FAMIXClassScanner >> defaultMetrics [
 		^ Dictionary new
 		at: 'scannedClasses' put: [ :aFAMIXClassScanner | aFAMIXClassScanner scannedClass  ];
 		at: 'className' put: [ :aFAMIXClassScanner | aFAMIXClassScanner scannedClass name ];
-		at: 'classSuffix' put: [ :aFAMIXClassScanner | aFAMIXClassScanner scannedClass name splitWithCamelCase last];
+		at: 'classSuffix' put: [ :aFAMIXClassScanner | aFAMIXClassScanner scannedClass name suffixWithCamelCase];
 		at: 'superclasses' put: [  :aFAMIXClassScanner | aFAMIXClassScanner scannedClass superclasses ];
 		at: 'package' put: [  :aFAMIXClassScanner | aFAMIXClassScanner scannedClass parentPackage ];
 		at: 'superclassesInCurrentPackage' put: [  :aFAMIXClassScanner | (aFAMIXClassScanner classNamesScanReport at: 'superclasses' ifAbsentPut: [  (self defaultMetrics at: 'superclasses') value: aFAMIXClassScanner  ]) select: [ :aFamixPackage| aFamixPackage parentPackage = aFAMIXClassScanner scannedClass parentPackage] ];

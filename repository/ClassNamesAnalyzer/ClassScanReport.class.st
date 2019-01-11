@@ -30,6 +30,11 @@ ClassScanReport >> allHierarchySuffixes [
 	^(self at: 'rootClass') classNamesScanReport hierarchieSuffixesAndClasses keys
 ]
 
+{ #category : #Queries }
+ClassScanReport >> allSubclasses [
+	^self classesGroupedBySuffixes values flatCollect: #yourself.
+]
+
 { #category : #'visualization-private' }
 ClassScanReport >> buildHierarchyBlueprintOf: aDicoOfSuffixesAndSubhierarchies using: dicoOfColors and: dicoOfVisualElementsIndices [
 	| view allHierarchieClasses aDicoOfSuffixesAndClasses layers |
@@ -94,25 +99,44 @@ ClassScanReport >> createEdgesFor: aClass on: view [
 	eb view: view.
 	eb shape line width: 0.1; color: (aClass indiceOfTheClassInHierarchy = 1 
 	ifTrue: Color transparent ifFalse: ((Color black adjustBrightness: -0.1) alpha: 0.1)).
-	eb connectFrom: aClass  to: ((aClass at: 'superclasse') ifNotNil: [(aClass at: 'superclasse') classNamesScanReport])  
+	eb connectFrom: aClass  to: (aClass at: 'superclasse') classNamesScanReport  
 ]
 
 { #category : #'visualization-private' }
 ClassScanReport >> createLayersFor: aDicoOfSuffixesAndClasses with: dicoOfColors in: view [
 	| orderedSuffixes nodes |
 	orderedSuffixes := self orderSuffixesAccordingToLongestSubHierarchy: aDicoOfSuffixesAndClasses.
-	^orderedSuffixes collect: [:aSuffix | | layer |
-	layer := (RTElement on: aSuffix)
-				+ (RTBox new borderColor: Color gray; color: Color transparent); @ RTPopup.
-				
-	nodes := (aDicoOfSuffixesAndClasses at: aSuffix) collect: [ :aClassReport| 
-		| supposedSubRoot |
-		supposedSubRoot := ((aClassReport at: 'superclasses') reversed detect: [ :each | each indiceOfTheClassInHierarchy = 1 ]) name .
-		(RTElement on: aClassReport) + (RTBox new color: (dicoOfColors at: supposedSubRoot); borderWidth: ((aClassReport at: 'isRoot') ifTrue: [1] ifFalse: [0]); borderColor: Color black; width: 1; height: 1); @ aClassReport mouseAnnouncerWithoutSubclasses; @ RTDraggable].
-	view add: layer.
-	view addAll: nodes.
-	(layer -> nodes)
-		].
+	^ orderedSuffixes
+		collect: [ :aSuffix | 
+			| layer |
+			layer := (RTElement on: aSuffix)
+				+
+					(RTBox new
+						borderColor: Color gray;
+						color: Color transparent);
+				@ RTPopup.
+			nodes := (aDicoOfSuffixesAndClasses at: aSuffix)
+				collect: [ :aClassReport | 
+					| supposedSubRoot |
+					supposedSubRoot := ((aClassReport at: 'superclasses') reversed
+						detect: [ :each | each indiceOfTheClassInHierarchy = 1 ]) name.
+					
+					(RTElement on: aClassReport)
+						+
+							(RTBox new
+								color: ((aSuffix = supposedSubRoot suffixWithCamelCase) ifTrue: [Color gray] ifFalse: [dicoOfColors at: supposedSubRoot]);
+								borderWidth:
+									((aClassReport at: 'isRoot')
+										ifTrue: [ 1 ]
+										ifFalse: [ 0 ]);
+								borderColor: Color black;
+								width: 1;
+								height: 1);
+						@ aClassReport mouseAnnouncerWithoutSubclasses;
+						@ RTDraggable ].
+			view add: layer.
+			view addAll: nodes.
+			layer -> nodes ]
 ]
 
 { #category : #accessing }
@@ -261,33 +285,29 @@ ClassScanReport >> nestLayers: layers with: dicoOfVisualElementsIndices [
 			]
 ]
 
+{ #category : #queries }
+ClassScanReport >> numberOfSuffixes [
+	^self classesGroupedBySuffixes keys size
+]
+
 { #category : #'visualization-private' }
 ClassScanReport >> orderSuffixesAccordingToLongestSubHierarchy: aDicoOfSuffixesAndClasses [
 
-	| allSuffixes |
+	| allSuffixes orderedSuffixes suffixWithRootClass |
 	allSuffixes := aDicoOfSuffixesAndClasses keys.
-	^allSuffixes
+
+	orderedSuffixes := (allSuffixes
 		sort: [ :first :second | 
 			| firstSuffixIndiceOfClasses secondSuffixIndiceOfClasses |
 			firstSuffixIndiceOfClasses := ((aDicoOfSuffixesAndClasses at: first)
 				collect: #indiceOfTheClassInHierarchy) max.
 			secondSuffixIndiceOfClasses := ((aDicoOfSuffixesAndClasses at: second)
 				collect: #indiceOfTheClassInHierarchy) max.
-			firstSuffixIndiceOfClasses > secondSuffixIndiceOfClasses ]
-]
-
-{ #category : #storage }
-ClassScanReport >> saveClassNameInformationTo: aMultiByteFileStream [ 
-	aMultiByteFileStream << (self at: 'className') << ';'
-	<< ((self at: 'rootClass') name) << ';'
-	<< (self at: 'CLASSNAME_usesSameSuffixeAsRoot') << ';'
-	<< (self at: 'CLASSNAME_isFalsePositive') << ';'
-	<< (self at: 'CLASSNAME_isNamedConsistently') << ';'
-	<< (self at: 'CLASSNAME_noteOnCoherence' ) << ';'
-	<< (self at: 'CLASSNAME_canBeFixedConformingToUnicityHypothesis').
-	aMultiByteFileStream crlf.
-	
-" CLASSNAME_usesAdifferentSuffixeThanRoot;CLASSNAME_isFalsePositive;CLASSNAME_isNamedInconsistently;CLASSNAME_noteOnCoherence;CLASSNAME_canBeFixedConformingToUnicityHypothesis"
+			firstSuffixIndiceOfClasses > secondSuffixIndiceOfClasses ]) asOrderedCollection.
+	suffixWithRootClass := orderedSuffixes detect: [:each | ((aDicoOfSuffixesAndClasses at: each) detect: [ :aClassScanReport | aClassScanReport at: 'isRoot'] ifNone: [ nil ] ) isNotNil ] ifNone: [Exception with: 'very funny no Root in the hierarchy'].
+		orderedSuffixes remove: (suffixWithRootClass).
+		orderedSuffixes addFirst: suffixWithRootClass.
+		^orderedSuffixes
 ]
 
 { #category : #storage }
