@@ -63,15 +63,15 @@ VocabularyScanner >> classBluePrint [
 		| b sortedRootClasses  delay |
 	^classNamesScanReport at: 'classBlueprint' ifAbsentPut:[ 	b := RTMondrian new.
 			delay:=Time now.
-			
+			self halt.
 	"TimeProfiler spyOn:["sortedRootClasses := (self classNamesScanReport
 		at: 'allRootClassesSortedByNumberOfSubClasses') collect: #value.
 	"dictionaryOfColors := self classNamesScanReport
 		at: 'colorsOfRootClasses'."
 	b shape rectangle withTextAbove.
-	b shape color: [ :each| Color white ];
+"	b shape color: [ :each| Color white ];
 	borderColor: [ :aPackage| Color gray ] .
-	b
+"	b
 		nodes: self scannedPackages
 		forEach: [ :aSinglePackage | 
 			| aSinglePackageScanReport sortedSuffixes unSortedSuffixes |
@@ -87,7 +87,9 @@ VocabularyScanner >> classBluePrint [
 						self dictionaryOfColors ifNil:[
 							self scannedEntities mooseModel allPackages scanClassNames
 							].
-					(self dictionaryOfColors at: dominantClasse) alpha: ((aSuffix value dominantHierarchieInPackages select: [ :each| each value >= aSuffix value dominanceLevel ]) size / aSuffix value dominantHierarchieInPackages size) ];
+						.
+						
+					(self dictionaryOfColors at: dominantClasse) adjustGray: aSuffix hierarchies asSet size"alpha: ((aSuffix value dominantHierarchieInPackages select: [ :each| each value >= aSuffix value dominanceLevel ]) size / aSuffix value dominantHierarchieInPackages size)" ];
 				withTextAbove: [:each| each value suffix];
 				borderWidth: 2.
 							b shape borderColor: [  :aSuffix | 
@@ -129,7 +131,7 @@ sortedSuffixes := aSinglePackageScanReport sortSuffixes: unSortedSuffixes.
 	
 	
 	b view elements do: [ :element| element announcer subscriptions  subscriptions do: [ :each | element announcer subscriptions  subscriptions remove: each ]].
-	b view elements do: [ :element| element @ (element model mouseAnnouncer)].
+	"b view elements do: [ :element| element @ (element model mouseAnnouncer)]".
 
 b shape line color: (Color white alpha: 0.05).
 	b edges: ((self classNamesScanReport at:'allClasses') collect: [ :each| 

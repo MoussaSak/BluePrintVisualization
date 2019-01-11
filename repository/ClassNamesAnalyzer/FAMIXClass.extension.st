@@ -1,7 +1,7 @@
-Extension { #name : #FAMIXType }
+Extension { #name : #FAMIXClass }
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXType >> allSubInheritances [
+FAMIXClass >> allSubInheritances [
 	|aCollection|
 	aCollection := OrderedCollection new.
 	aCollection addAll: subInheritances.
@@ -9,54 +9,54 @@ FAMIXType >> allSubInheritances [
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXType >> classNamesScanReport [
+FAMIXClass >> classNamesScanReport [
 	^self vocabularyScanner classNamesScanReport.
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXType >> indiceOfTheClassInHierarchy [
+FAMIXClass >> indiceOfTheClassInHierarchy [
 	^self classNamesScanReport indiceOfTheClassInHierarchy.
 ]
 
 { #category : #'*classNamesAnalyzer' }
-FAMIXType >> indiceOfTheClassInSubHierarchy [
+FAMIXClass >> indiceOfTheClassInSubHierarchy [
 	^self vocabularyScanner classNamesScanReport indiceOfTheClassInSubHierarchy.
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXType >> isMetaRoot [
+FAMIXClass >> isMetaRoot [
 	^self nameSuffix = 'Object'
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXType >> isaRootClass [
+FAMIXClass >> isaRootClass [
 	^self superclass = nil or: [self superclass isMetaRoot].
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXType >> nameSuffix [
-	^self name splitWithCamelCase last.
+FAMIXClass >> nameSuffix [
+	^self name suffixWithCamelCase.
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXType >> rootClass [
+FAMIXClass >> rootClass [
 	^self superclasses first.
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXType >> scanClassNames [
+FAMIXClass >> scanClassNames [
 	^FAMIXClassScanner scan: self
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXType >> superclasses [
+FAMIXClass >> superclasses [
 	self isaRootClass 
 		ifTrue:[ ^ OrderedCollection with: self ]
 		ifFalse: [ ^self superclass superclasses add: self;yourself ]
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXType >> vocabularyScanner [
+FAMIXClass >> vocabularyScanner [
 |a|
 a := 
 	self privateState attributeAt: #vocabularyScanner ifAbsentPut: (nil).
@@ -65,6 +65,6 @@ a :=
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXType >> vocabularyScanner: aFAMIXClassScanner [ 
+FAMIXClass >> vocabularyScanner: aFAMIXClassScanner [ 
 	self privateState attributeAt: #vocabularyScanner put: aFAMIXClassScanner.
 ]

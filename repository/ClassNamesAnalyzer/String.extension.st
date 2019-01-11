@@ -21,3 +21,24 @@ String >> splitWithCamelCase [
 		^tokens
 
 ]
+
+{ #category : #'*ClassNamesAnalyzer' }
+String >> suffixWithCamelCase [
+	"'CamelCase' suffixWithCamelCase =  'Case'."
+
+	"'GoodMoriningAmerica' suffixWithCamelCase =  'America'."
+
+	"'GCOptimizer' suffixWithCamelCase =  'Optimizer'."
+
+	"'optimizerOfGC' suffixWithCamelCase = 'GC'."
+
+	"'BrowserForFAMIX' remmoveAll: suffixWithCamelCase = 'FAMIX'"
+
+	| indexOfCaseChange stringWithoutNumbers | 
+	
+	stringWithoutNumbers := self select: #isLetter.
+	indexOfCaseChange := stringWithoutNumbers reverse first isLowercase
+		ifTrue: [ stringWithoutNumbers reverse indexOf: (stringWithoutNumbers select: #isUppercase) last ]
+		ifFalse: [ (stringWithoutNumbers reverse indexOf: (stringWithoutNumbers select: #isLowercase) last) - 1 ].
+	^ stringWithoutNumbers copyFrom: stringWithoutNumbers size + 1 - indexOfCaseChange to: stringWithoutNumbers size
+]

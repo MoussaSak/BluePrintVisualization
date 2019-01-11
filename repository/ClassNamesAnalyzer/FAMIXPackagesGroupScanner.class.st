@@ -24,6 +24,20 @@ FAMIXPackagesGroupScanner class >> scan: aFAMIXPackageGroup [
 	^super scan: aFAMIXPackageGroup 
 ]
 
+{ #category : #'visualization-private' }
+FAMIXPackagesGroupScanner >> addBlueprintLegendOn: view [
+
+	| lb |
+	lb := RTLegendBuilder new.
+	"lb onDemand."
+	lb view: view.
+ 	((self classNamesScanReport at: 'allRootClasses') asSet collect: #key) do: [ :each | lb addColor: (self scannedPackages mooseModel dictionaryOfRootClassColors at: each) text: each name].
+	"lb addColor: Color blue text: 'TestAsserter hierarchy'"
+	lb build
+
+
+]
+
 { #category : #queries }
 FAMIXPackagesGroupScanner >> allCoherentHierarchies [
 	^self allHierarchies select: [:each | each allHierarchySuffixes size = 1].
@@ -78,21 +92,34 @@ FAMIXPackagesGroupScanner >> allSuffixes [
 FAMIXPackagesGroupScanner >> defaultMetrics [
 	^ Dictionary new
 		at: 'numberOfPackages' put: [ :aGroupOfScanReports | aGroupOfScanReports size ];
-		at: 'allClasses' put: [ :aGroupOfScanReports | aGroupOfScanReports flatCollect: [ :aPackageScanReport| aPackageScanReport at: 'allClasses']  ];
-		at: 'classNames' put: [ :aGroupOfScanReports | aGroupOfScanReports flatCollect: [ :aPackageScanReport| aPackageScanReport at: 'classNames']];
-		at: 'allRootClasses' put: [ :aGroupOfScanReports | aGroupOfScanReports flatCollect: [ :aPackageScanReport| aPackageScanReport at: 'allRootClasses']];
-		
-				at: 'hierarchiesGroupedBySuffixes' put: [ :aGroupOfScanReports | 
-					((self classNamesScanReport at: 'allClassNameSuffixesSorted' ifAbsentPut: [(self defaultMetrics at:'allClassNameSuffixesSorted') value: aGroupOfScanReports]) collect: [:association|
-						association value suffix->association value hierarchies]) asDictionary
-					];
+		at: 'allClasses'
+			put: [ :aGroupOfScanReports | 
+			aGroupOfScanReports
+				flatCollect: [ :aPackageScanReport | aPackageScanReport at: 'allClasses' ] ];
+		at: 'classNames'
+			put: [ :aGroupOfScanReports | 
+			aGroupOfScanReports
+				flatCollect: [ :aPackageScanReport | aPackageScanReport at: 'classNames' ] ];
+		at: 'allRootClasses'
+			put: [ :aGroupOfScanReports | 
+				
+			aGroupOfScanReports
+				flatCollect: [ :aPackageScanReport | aPackageScanReport at: 'allRootClasses' ] ];
+		at: 'hierarchiesGroupedBySuffixes'
+			put: [ :aGroupOfScanReports | 
+			((self classNamesScanReport
+				at: 'allClassNameSuffixesSorted'
+				ifAbsentPut: [ (self defaultMetrics at: 'allClassNameSuffixesSorted') value: aGroupOfScanReports ])
+				collect: [ :association | association value suffix -> association value hierarchies ])
+				asDictionary ];
+		at: 'allClassNameSuffixesSorted'
+			put: [ :aGroupOfScanReports | 
+			| suffixScanReports |
+			suffixScanReports := ((self classNamesScanReport subEntityScanReports
+				collect: [ :aPackageScanReport | aPackageScanReport at: 'allClassNameSuffixesSorted' ])
+				flatCollect: #value) collect: #value.
+			self allClassNameSuffixesSorted: suffixScanReports
 
-		
-		at: 'allClassNameSuffixesSorted' put: [ :aGroupOfScanReports | 
-			|suffixScanReports|
-			suffixScanReports := ((self classNamesScanReport subEntityScanReports collect: [ :aPackageScanReport|  aPackageScanReport at: 'allClassNameSuffixesSorted']) flatCollect: #value)collect: #value.
-			self allClassNameSuffixesSorted: suffixScanReports.
-			
 			"|aDictionary|
 			aDictionary := Dictionary new.
 (self classNamesScanReport at: 'allRootClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClasses') value: aGroupOfScanReports]) collect: [:association|
@@ -100,48 +127,82 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 	suffix := association value at: 'classSuffix'.
 	rootClass := association key.
 	aDictionary at: suffix ifPresent: [(aDictionary at: suffix) add: rootClass ] ifAbsentPut: [Bag with: rootClass] ].
-	aDictionary"];
-
-		at: 'dominantRootsInSuffix' put: [ :aGroupOfScanReports | 
-			((self classNamesScanReport at: 'hierarchiesGroupedBySuffixes' ifAbsentPut: [(self defaultMetrics at:'hierarchiesGroupedBySuffixes') value: aGroupOfScanReports])associations collect: [:association|association key -> association value sortedCounts])asDictionary];
-
-
-		at: 'suffixesGroupedByRootClasses' put: [ :aGroupOfScanReports | 
-			|aDictionary|
+	aDictionary" ];
+		at: 'dominantRootsInSuffix'
+			put: [ :aGroupOfScanReports | 
+			((self classNamesScanReport
+				at: 'hierarchiesGroupedBySuffixes'
+				ifAbsentPut: [ (self defaultMetrics at: 'hierarchiesGroupedBySuffixes') value: aGroupOfScanReports ])
+				associations
+				collect: [ :association | association key -> association value sortedCounts ])
+				asDictionary ];
+		at: 'suffixesGroupedByRootClasses'
+			put: [ :aGroupOfScanReports | 
+			| aDictionary |
 			aDictionary := Dictionary new.
-(self classNamesScanReport at: 'allClassesGroupedByRootClasses' ifAbsentPut: [(self defaultMetrics at:'allClassesGroupedByRootClasses') value: aGroupOfScanReports]) associations collect: [:association|
-	association key -> (association value collect: [:aReport| aReport at: 'classSuffix'])
-	]];
-		
-		
-		at: 'allClassesGroupedByRootClasses' put: [ :aGroupOfScanReports | 
-			|aDictionary|
+			(self classNamesScanReport
+				at: 'allClassesGroupedByRootClasses'
+				ifAbsentPut: [ (self defaultMetrics at: 'allClassesGroupedByRootClasses') value: aGroupOfScanReports ])
+				associations
+				collect:
+					[ :association | association key -> (association value collect: [ :aReport | aReport at: 'classSuffix' ]) ] ];
+		at: 'allClassesGroupedByRootClasses'
+			put: [ :aGroupOfScanReports | 
+			| aDictionary |
 			aDictionary := Dictionary new.
-			(self classNamesScanReport at: 'allRootClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClasses') value: aGroupOfScanReports]) do:[:anAssociation|
-				|root subClass|
-				root := anAssociation key.
-				subClass := anAssociation value.
-				aDictionary at: root ifPresent: [ (aDictionary at: root) add: subClass;yourself ] ifAbsentPut: [ Bag with: subClass ]
-			
-				].
-			aDictionary];
-		
-		at: 'allRootClassesSortedByNumberOfSubClasses' put: [ :aGroupOfScanReports | ((self classNamesScanReport at: 'allRootClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClasses') value: aGroupOfScanReports]) collect:#key) asBag sortedCounts];
-		
-		at: 'allRootClassesAsaSet' put: [ :aGroupOfScanReports | (self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClassesSortedByNumberOfSubClasses') value: aGroupOfScanReports] ) collect: #value ];
-		
-		at: 'colorsOfRootClasses' put: [ :aGroupOfScanReports | 
-			self scannedEntities mooseModel dictionaryOfRootClassColors ifNil:
-			[|aDictionaryOfColors i|
-			i := 0.
-			aDictionaryOfColors := Dictionary new.
-			
-			(self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClassesSortedByNumberOfSubClasses') value: aGroupOfScanReports] ) do: [ :aRootClass| aRootClass value isMetaRoot ifTrue: [aDictionaryOfColors at: aRootClass value put: (Color gray: 1) ] ifFalse: [ i:= i+1. aDictionaryOfColors at: aRootClass value put: (self pickAnAvailableColorNumber: i) ]. self saveInMooseModel: aDictionaryOfColors ]]];
-		
+			(self classNamesScanReport
+				at: 'allRootClasses'
+				ifAbsentPut: [ (self defaultMetrics at: 'allRootClasses') value: aGroupOfScanReports ])
+				do: [ :anAssociation | 
+					| root subClass |
+					root := anAssociation key.
+					subClass := anAssociation value.
+					aDictionary
+						at: root
+						ifPresent: [ (aDictionary at: root)
+								add: subClass;
+								yourself ]
+						ifAbsentPut: [ Bag with: subClass ] ].
+			aDictionary ];
+		at: 'allRootClassesSortedByNumberOfSubClasses'
+			put: [ :aGroupOfScanReports | 
+			((self classNamesScanReport
+				at: 'allRootClasses'
+				ifAbsentPut: [ (self defaultMetrics at: 'allRootClasses') value: aGroupOfScanReports ])
+				collect: #key) asBag sortedCounts ];
+		at: 'allRootClassesAsaSet'
+			put: [ :aGroupOfScanReports | 
+			(self classNamesScanReport
+				at: 'allRootClassesSortedByNumberOfSubClasses'
+				ifAbsentPut: [ (self defaultMetrics at: 'allRootClassesSortedByNumberOfSubClasses')
+						value: aGroupOfScanReports ]) collect: #value ];
+		at: 'colorsOfRootClasses'
+			put: [ :aGroupOfScanReports | 
+				| aDictionaryOfColors i |
+			aDictionaryOfColors := self scannedEntities mooseModel dictionaryOfRootClassColors
+				ifNil: [ 
+					aDictionaryOfColors := Dictionary new].
+				i := aDictionaryOfColors size.
+					
+					(self classNamesScanReport
+						at: 'allRootClassesSortedByNumberOfSubClasses'
+						ifAbsentPut: [ (self defaultMetrics at: 'allRootClassesSortedByNumberOfSubClasses')
+								value: aGroupOfScanReports ])
+						do: [ :aRootClass | 
+							aDictionaryOfColors at: aRootClass ifAbsent: [
+							aRootClass value isMetaRoot
+								ifTrue: [ aDictionaryOfColors at: aRootClass value put: (Color gray: 1) ]
+								ifFalse: [ aRootClass value vocabularyScanner classNamesScanReport allSubclasses size > 1
+										ifTrue: [ aRootClass value vocabularyScanner classNamesScanReport numberOfSuffixes = 1 ifTrue:[ aDictionaryOfColors at: aRootClass value put: Color gray ] ifFalse:[i := i + 1.
+											aDictionaryOfColors
+												at: aRootClass value
+												put: (self pickAnAvailableColorNumber: i)] ]
+										ifFalse: [ aDictionaryOfColors at: aRootClass value put: Color white ] ].
+							self saveInMooseModel: aDictionaryOfColors ] ] ];
 		yourself
 ]
 
-{ #category : #storage }
+{ #category : #'instance-creation' }
 FAMIXPackagesGroupScanner >> generateCSVFor: aProject [
 	| stream anOutputFileName |
 	
@@ -168,39 +229,7 @@ FAMIXPackagesGroupScanner >> generateCSVFor: aProject [
 	stream crlf.
 	] ensure:[stream close].
 
-	self generateCSVSuffixReportFor: aProject.
-"anOutputFileName := aProject, 'HierarchiesReport', Date today yyyymmdd, '_', Time now hhmm24,'.txt'.
-	[ stream := anOutputFileName asFileReference writeStream.
-	stream setToEnd.
-	stream << 'Hierarchy;HIERARHCY_usesManySuffixes;HIERARHCY_isFalsePositive;HIERARHCY_isNamedInconsistently;HIERARHCY_noteOnCoherence;HIERARHCY_canBeFixedConformingToUnicityHypothesis'.
-	stream crlf.
-self allHierarchies do: [ :aHierarchyScanReport| 
-		aHierarchyScanReport value saveTo: stream].
-	] ensure:[stream close].
-"
-	self generateCSVHierarchyFor: aProject.
-
-]
-
-{ #category : #storage }
-FAMIXPackagesGroupScanner >> generateCSVHierarchyFor: aProject [
-	| anOutputFileName stream |
-	anOutputFileName := aProject, 'ClassesReport', Date today yyyymmdd, '_', Time now hhmm24,'.txt'.
-	[ stream := anOutputFileName asFileReference writeStream.
-	stream setToEnd.
-	stream << 'ClassName;HierarchyName; CLASSNAME_usesSameSuffixeAsRoot;CLASSNAME_isFalsePositive;CLASSNAME_isNamedConsistently;CLASSNAME_noteOnCoherence;CLASSNAME_canBeFixedConformingToUnicityHypothesis'.
-	stream crlf.
-(self classNamesScanReport at: 'allClasses') do: [ :aClass| 
-		(aClass classNamesScanReport at: 'isMetaRoot') ifFalse: [aClass classNamesScanReport saveClassNameInformationTo: stream]].
-	] ensure:[stream close].
-
-]
-
-{ #category : #storage }
-FAMIXPackagesGroupScanner >> generateCSVSuffixReportFor: aProject [
-	| stream anOutputFileName |
-	
-	anOutputFileName := aProject, 'SuffixReport', Date today yyyymmdd, '_', Time now hhmm24,'.txt'.
+anOutputFileName := aProject, 'SuffixReport', Date today yyyymmdd, '_', Time now hhmm24,'.txt'.
 	[ stream := anOutputFileName asFileReference writeStream.
 	stream setToEnd.
 	stream << 'suffix;isUsedInManyHierarchies;isFalsePositive;isTrueAmbiguous;note;canBeFixedConformingToUnicityHypothesis'.
@@ -208,7 +237,14 @@ FAMIXPackagesGroupScanner >> generateCSVSuffixReportFor: aProject [
 self allSuffixes do: [ :aSuffixScanReport| 
 		aSuffixScanReport value saveTo: stream].
 	] ensure:[stream close].
-
+anOutputFileName := aProject, 'HierarchiesReport', Date today yyyymmdd, '_', Time now hhmm24,'.txt'.
+	[ stream := anOutputFileName asFileReference writeStream.
+	stream setToEnd.
+	stream << 'Hierarchy;HIERARHCY_usesManySuffixes;HIERARHCY_isFalsePositive;HIERARHCY_isNamedInconsistently;HIERARHCY_noteOnCoherence;HIERARHCY_canBeFixedConformingToUnicityHypothesis'.
+	stream crlf.
+self allHierarchies do: [ :aHierarchyScanReport| 
+		aHierarchyScanReport value saveTo: stream].
+	] ensure:[stream close].
 ]
 
 { #category : #accessing }
