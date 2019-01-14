@@ -1,25 +1,23 @@
 Class {
-	#name : #BaseLineOfClassNamesAnalyzer,
+	#name : #BaselineOfClassNamesAnalyzer,
 	#superclass : #BaselineOf,
 	#category : #BaseLineOfClassNamesAnalyzer
 }
 
 { #category : #baselines }
-BaseLineOfClassNamesAnalyzer >> baseline: spec [
+BaselineOfClassNamesAnalyzer >> baseline: spec [
   <baseline>
   spec
     for: #common
 	 
     do: [
-	"Dependencies"
-	self classNamesAnalyzer: spec.
-	"Packages"
+		"Packages"
       spec
-        package: 'ClassNamesAnalyzer';
+        package: 'ClassNamesAnalyzer' with: [spec requires: #('ColorsExtensions''Moose')];
         package: 'ClassNamesAnalyzer-Examples' with: [spec requires: #('ClassNamesAnalyzer')];
-        package: 'ClassNamesAnalyzer-Reports';
-        package: 'ClassNamesAnalyzer-Tests';
-        package: 'ClassNamesAnalyzer-Extensions'.
+        package: 'ClassNamesAnalyzer-Reports' with: [spec requires: #('ClassNamesAnalyzer')];
+        package: 'ClassNamesAnalyzer-Tests' with: [spec requires: #('ClassNamesAnalyzer')];
+        package: 'ClassNamesAnalyzer-Extensions' with: [spec requires: #('ClassNamesAnalyzer')].
   		spec
     	baseline: 'ColorsExtensions'
     	with: [ spec repository: 'github://pharo-contributions/ColorsExtensions:master/src' ] .
