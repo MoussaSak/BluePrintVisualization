@@ -12,18 +12,6 @@ RTEdge >> colorEdgesFromSubClassesIn: aColor whenEntring: entring [
 
 ]
 
-{ #category : #'*ClassNamesAnalyzer' }
-RTEdge >> colorEdgesToSubClassesIn: aColor [ 
-	self color: aColor.
-	self from incomingEdges do: [:each| each colorEdgesToSubClassesIn: aColor] 
-]
-
-{ #category : #'*ClassNamesAnalyzer' }
-RTEdge >> colorEdgesToSuperClassesIn: aColor [ 
-	self color: aColor.
-	self to outgoingEdges do: [:each| each colorEdgesToSuperClassesIn: aColor] 
-]
-
 { #category : #'*classNamesAnalyzer' }
 RTEdge >> colorEdgesToSuperClassesIn: aColor whenEntring: entring [
 	self color: aColor.
