@@ -1,7 +1,7 @@
 Class {
 	#name : #BaselineOfClassNamesAnalyzer,
 	#superclass : #BaselineOf,
-	#category : #BaseLineOfClassNamesAnalyzer
+	#category : #BaselineOfClassNamesAnalyzer
 }
 
 { #category : #baselines }
