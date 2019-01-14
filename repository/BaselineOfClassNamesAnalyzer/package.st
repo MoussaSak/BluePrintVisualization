@@ -1,1 +1,1 @@
-Package { #name : #BaselineOfClassNamesAnalyzer }
+Package { #name : #BaselineOfClassNamesAnalyzer  }

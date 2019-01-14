@@ -8,6 +8,7 @@ Class {
 BaselineOfClassNamesAnalyzer >> baseline: spec [
   <baseline>
   spec
+
     for: #common
 	 
     do: [
