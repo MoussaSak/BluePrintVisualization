@@ -63,7 +63,6 @@ VocabularyScanner >> classBluePrint [
 		| b sortedRootClasses  delay |
 	^classNamesScanReport at: 'classBlueprint' ifAbsentPut:[ 	b := RTMondrian new.
 			delay:=Time now.
-			self halt.
 	"TimeProfiler spyOn:["sortedRootClasses := (self classNamesScanReport
 		at: 'allRootClassesSortedByNumberOfSubClasses') collect: #value.
 	"dictionaryOfColors := self classNamesScanReport
