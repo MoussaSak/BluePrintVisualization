@@ -149,45 +149,58 @@ ClassScanReport >> groupOfPackagesScanReport [
 ClassScanReport >> hierarchicalVisualisationWithCouleredSuffixes [
 	| b allHierarchyClasses allPackages aDico |
 	aDico := Dictionary new.
-allHierarchyClasses := ((((self at: 'rootClass') allSubInheritances collect: #from) addFirst: (self at: 'rootClass'); yourself) collect: #vocabularyScanner) collect: #classNamesScanReport.	
-allPackages := (allHierarchyClasses collect: [ :each | each at: 'package' ]) asSet.
-
-b := RTMondrian new.
-b shape rectangle withTextAbove: [:each| each name];
-color: Color transparent;
-borderColor: Color gray.
-b nodes: allPackages forEach: [ 
-	:aPackage |
-	b shape rectangle "withTextAbove: [:aReport | '']";
-	size: 40;
-	color: [ :aReport | 
-					aDico at: (aReport at: 'classSuffix') ifAbsentPut: Color random].
-
-	b nodes: (allHierarchyClasses select: [ :aReport | (aReport at: 'package') = aPackage ] ).
+	allHierarchyClasses := ((((self at: 'rootClass') allSubInheritances
+		collect: #from)
+		addFirst: (self at: 'rootClass');
+		yourself) collect: #vocabularyScanner)
+		collect: #classNamesScanReport.
+	allPackages := (allHierarchyClasses
+		collect: [ :each | each at: 'package' ]) asSet.
+	b := RTMondrian new.
+	b shape rectangle
+		withTextAbove: [ :each | each name ];
+		color: Color transparent;
+		borderColor: Color gray.
+	b
+		nodes: allPackages
+		forEach: [ :aPackage | 
+			b shape
+				"withTextAbove: [:aReport | '']"
+					rectangle;
+				size: 40;
+				color:
+						[ :aReport | aDico at: (aReport at: 'classSuffix') ifAbsentPut: Color random ].
+			b
+				nodes:
+					(allHierarchyClasses
+						select: [ :aReport | (aReport at: 'package') = aPackage ]).
+			b layout tree.
+			b edges
+				connectFrom:
+					[ :each | (each at: 'superclasse') vocabularyScanner classNamesScanReport ] ].
+	b view elements do: [ :element | element removeConnectedEdges ].
+	b view elements
+		do: [ :element | 
+			element announcer subscriptions subscriptions
+				do:
+					[ :each | element announcer subscriptions subscriptions remove: each ] ].
+	b view elements
+		do: [ :element | element @ element model mouseAnnouncer ].
 	b layout tree.
-	
-	b edges connectFrom: [ :each|
-	 (each at: 'superclasse') vocabularyScanner classNamesScanReport]
-	].
-b view elements do: [:element| element removeConnectedEdges].
-
-	b view elements do: [ :element| element announcer subscriptions  subscriptions do: [ :each | element announcer subscriptions  subscriptions remove: each ]].
-	b view elements do: [ :element| element @ (element model mouseAnnouncer)].
-b layout tree.
-
-b shape line color: (Color gray).
-b edges: allHierarchyClasses from: #yourself to: [ :aClassScanReport| (aClassScanReport at: 'superclasse') ifNotNil: [ (aClassScanReport at: 'superclasse') vocabularyScanner classNamesScanReport ] ].
-b shape line color: (Color transparent).
-b edges connectFromAll: [ :aPackage| 
-	 aPackage queryOutgoingInheritances atPackageScope withoutSelfLoops asSet
-	 ].
-
-
-
-^b
-
-
-
+	b shape line color: Color gray.
+	b
+		edges: allHierarchyClasses
+		from: #yourself
+		to: [ :aClassScanReport | 
+			(aClassScanReport at: 'superclasse')
+				ifNotNil: [ (aClassScanReport at: 'superclasse') vocabularyScanner
+						classNamesScanReport ] ].
+	b shape line color: Color transparent.
+	b edges
+		connectFromAll: [ :aPackage | 
+			(aPackage queryOutgoingInheritances atScope: FamixTPackage)
+				withoutSelfLoops asSet ].
+	^ b
 ]
 
 { #category : #queries }
