@@ -4,17 +4,17 @@ Class {
 	#category : #'ClassNamesAnalyzer-Core'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 PackageScanReport >> classScanReports [
 	^self subEntityScanReports
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 PackageScanReport >> classScanReports: aGoupOfReports [
 	^self subEntityScanReports: aGoupOfReports
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #sorting }
 PackageScanReport >> sortSuffixes: unSortedSuffixes [ 
 |colorClusters temp result|
 result := OrderedCollection new.

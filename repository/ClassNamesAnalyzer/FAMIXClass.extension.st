@@ -14,13 +14,13 @@ FAMIXClass >> classNamesScanReport [
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXClass >> indiceOfTheClassInHierarchy [
-	^self classNamesScanReport indiceOfTheClassInHierarchy.
+FAMIXClass >> indexOfTheClassInHierarchy [
+	^self classNamesScanReport indexOfTheClassInHierarchy.
 ]
 
 { #category : #'*classNamesAnalyzer' }
-FAMIXClass >> indiceOfTheClassInSubHierarchy [
-	^self vocabularyScanner classNamesScanReport indiceOfTheClassInSubHierarchy.
+FAMIXClass >> indexOfTheClassInSubHierarchy [
+	^self vocabularyScanner classNamesScanReport indexOfTheClassInSubHierarchy.
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
@@ -34,6 +34,11 @@ FAMIXClass >> isaRootClass [
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
+FAMIXClass >> nameAnalyser [
+	^FAMIXClassAnalyser scan: self
+]
+
+{ #category : #'*ClassNamesAnalyzer' }
 FAMIXClass >> nameSuffix [
 	^self name suffixWithCamelCase.
 ]
@@ -41,11 +46,6 @@ FAMIXClass >> nameSuffix [
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXClass >> rootClass [
 	^self superclasses first.
-]
-
-{ #category : #'*ClassNamesAnalyzer' }
-FAMIXClass >> scanClassNames [
-	^FAMIXClassScanner scan: self
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
@@ -59,11 +59,15 @@ FAMIXClass >> superclasses [
 
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXClass >> vocabularyScanner [
-|a|
-a := 
-	self privateState attributeAt: #vocabularyScanner ifAbsentPut: (nil).
-	a ifNil: [ a := (self privateState attributeAt: #vocabularyScanner put: ( self scanClassNames )) value ].
-	^a
+	| a |
+	a := self privateState
+		attributeAt: #vocabularyScanner
+		ifAbsentPut: [ nil ].
+	a
+		ifNil: [ a := (self privateState
+				attributeAt: #vocabularyScanner
+				put: self nameAnalyser) value ].
+	^ a
 ]
 
 { #category : #'*ClassNamesAnalyzer' }

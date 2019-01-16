@@ -1,16 +1,19 @@
+"
+I'm a name analyser. I'm specialised to handle StPackage.
+"
 Class {
-	#name : #FAMIXPackageScanner,
-	#superclass : #VocabularyScanner,
+	#name : #FAMIXStPackageAnalyser,
+	#superclass : #AbstractClassNameAnalyser,
 	#category : #'ClassNamesAnalyzer-Core'
 }
 
-{ #category : #'as yet unclassified' }
-FAMIXPackageScanner class >> reportClass [
+{ #category : #'instance-creation' }
+FAMIXStPackageAnalyser class >> reportClass [
 	^PackageScanReport
 ]
 
-{ #category : #accessing }
-FAMIXPackageScanner >> defaultMetrics [
+{ #category : #accesing }
+FAMIXStPackageAnalyser >> defaultMetrics [
 	
 	^ Dictionary new
 		at: 'numberOfPackages' put: [ :argh | 1 ];
@@ -92,28 +95,17 @@ FAMIXPackageScanner >> defaultMetrics [
 		yourself
 ]
 
-{ #category : #accessing }
-FAMIXPackageScanner >> groupOfPackagesScanReport [
-	"Ugly hack. Should be removed once suffixes are grouped in a dedicated report"
-	^self scannedEntities mooseModel allPackages vocabularyScanner classNamesScanReport
-]
-
-{ #category : #accessing }
-FAMIXPackageScanner >> scannedPackage [
+{ #category : #Accessing }
+FAMIXStPackageAnalyser >> scannedPackage [
 	^ self scannedEntities
 ]
 
 { #category : #accessing }
-FAMIXPackageScanner >> scannedPackage: aFAMIXPackage [ 
-	self scannedEntities: aFAMIXPackage
-]
-
-{ #category : #accessing }
-FAMIXPackageScanner >> scannedPackages [
+FAMIXStPackageAnalyser >> scannedPackages [
 	^{self scannedPackage}.
 ]
 
 { #category : #accessing }
-FAMIXPackageScanner >> subEntities [
+FAMIXStPackageAnalyser >> subEntities [
 	^self scannedPackage classes
 ]

@@ -24,20 +24,20 @@ FAMIXPackage >> mouseAnnouncer [
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
+FAMIXPackage >> nameAnalyser [
+	^FAMIXPackageAnalyser scan: self
+]
+
+{ #category : #'*ClassNamesAnalyzer' }
 FAMIXPackage >> packageViewIn: composite [
 	<gtInspectorPresentationOrder: -10>
 	<moosePresentationOrder: -20>
 	composite roassal2
-		title: '42NameBlueprint';
+		title: 'PNameBlueprint';
 		initializeView: [ | view |
 			view := self vocabularyScanner classBluePrint.
 			self addClassBlueprintLegendOn: view view.
 			view ]
-]
-
-{ #category : #'*ClassNamesAnalyzer' }
-FAMIXPackage >> scanClassNames [
-	^FAMIXPackageScanner scan: self
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
@@ -47,11 +47,16 @@ FAMIXPackage >> viewInClassBluePrint [
 
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXPackage >> vocabularyScanner [
-|a|
-a := 
-	self privateState attributeAt: #vocabularyScanner ifAbsentPut: (nil).
-	a ifNil: [ a := (self privateState attributeAt: #vocabularyScanner put: (FAMIXPackageScanner scan: self)) value ].
-	^a
+	| a |
+	a := self privateState
+		attributeAt: #vocabularyScanner
+		ifAbsentPut: [ nil ].
+	self flag: #toFix. "the [nil] should probably be replace by the bock below!"
+	a
+		ifNil: [ a := (self privateState
+				attributeAt: #vocabularyScanner
+				put: (FAMIXPackageAnalyser scan: self)) value ].
+	^ a
 ]
 
 { #category : #'*ClassNamesAnalyzer' }

@@ -1,8 +1,8 @@
 Extension { #name : #FamixStPackage }
 
 { #category : #'*classNamesAnalyzer' }
-FamixStPackage >> indiceOfTheClassInSubHierarchy [
-	^self vocabularyScanner classNamesScanReport indiceOfTheClassInSubHierarchy.
+FamixStPackage >> indexOfTheClassInSubHierarchy [
+	^self vocabularyScanner classNamesScanReport indexOfTheClassInSubHierarchy.
 ]
 
 { #category : #'*classNamesAnalyzer' }
@@ -11,34 +11,38 @@ FamixStPackage >> mouseAnnouncer [
 ]
 
 { #category : #'*classNamesAnalyzer' }
+FamixStPackage >> nameAnalyser [
+	^FAMIXPackageAnalyser scan: self
+]
+
+{ #category : #'*classNamesAnalyzer' }
 FamixStPackage >> packageViewIn: composite [
 	<gtInspectorPresentationOrder: -10>
 	<moosePresentationOrder: -20>
 	composite roassal2
-		title: 'NameBlueprint';
-		initializeView: [ |view|
+		title: 'PNameBlueprint';
+		initializeView: [ | view |
 			view := self vocabularyScanner classBluePrint.
 			self addClassBlueprintLegendOn: view view.
 			view ]
 ]
 
 { #category : #'*classNamesAnalyzer' }
-FamixStPackage >> scanClassNames [
-	^FAMIXPackageScanner scan: self
-]
-
-{ #category : #'*classNamesAnalyzer' }
 FamixStPackage >> viewInClassBluePrint [
-	^'package Name: ', (self vocabularyScanner classNamesScanReport at: 'packageName') asString
+	^ 'package Name: ', (self vocabularyScanner classNamesScanReport at: 'packageName') asString
 ]
 
 { #category : #'*classNamesAnalyzer' }
 FamixStPackage >> vocabularyScanner [
-|a|
-a := 
-	self privateState attributeAt: #vocabularyScanner ifAbsentPut: (nil).
-	a ifNil: [ a := (self privateState attributeAt: #vocabularyScanner put: (FAMIXPackageScanner scan: self)) value ].
-	^a
+	| a |
+	a := self privateState
+		attributeAt: #vocabularyScanner
+		ifAbsentPut: [ nil] .
+	a
+		ifNil: [ a := (self privateState
+				attributeAt: #vocabularyScanner
+				put: (FAMIXPackageAnalyser scan: self)) value ].
+	^ a
 ]
 
 { #category : #'*ClassNamesAnalyzer' }

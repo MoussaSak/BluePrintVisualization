@@ -1,21 +1,24 @@
+"
+I analyze Class names, i am specialied in handling class names.
+"
 Class {
-	#name : #FAMIXClassScanner,
-	#superclass : #VocabularyScanner,
+	#name : #FAMIXClassAnalyser,
+	#superclass : #AbstractClassNameAnalyser,
 	#category : #'ClassNamesAnalyzer-Core'
 }
 
 { #category : #'as yet unclassified' }
-FAMIXClassScanner class >> reportClass [
+FAMIXClassAnalyser class >> reportClass [
 	^ClassScanReport
 ]
 
 { #category : #'as yet unclassified' }
-FAMIXClassScanner >> computeRootClassFor: aFAMIXClassScanner [
+FAMIXClassAnalyser >> computeRootClassFor: aFAMIXClassScanner [
 	^ (self computeSuperClassesOf: aFAMIXClassScanner) first
 ]
 
 { #category : #'as yet unclassified' }
-FAMIXClassScanner >> computeSuperClassesOf: aFAMIXClassScanner [
+FAMIXClassAnalyser >> computeSuperClassesOf: aFAMIXClassScanner [
 	^ (aFAMIXClassScanner classNamesScanReport
 		at: 'superclasses'
 		ifAbsentPut: [ (self defaultMetrics at: 'superclasses') value: aFAMIXClassScanner ])
@@ -23,7 +26,7 @@ FAMIXClassScanner >> computeSuperClassesOf: aFAMIXClassScanner [
 ]
 
 { #category : #'as yet unclassified' }
-FAMIXClassScanner >> defaultMetrics [
+FAMIXClassAnalyser >> defaultMetrics [
 	"use 'aFAMIXClassScanner classNamesScanReport' whenever an expensive computation is required and has been computed in a previous metric
 	Example : rootClass uses the metric superclasses"
 
@@ -45,13 +48,13 @@ FAMIXClassScanner >> defaultMetrics [
 			(aFAMIXClassScanner classNamesScanReport
 				at: 'superclasses'
 				ifAbsentPut: [ (self defaultMetrics at: 'superclasses') value: aFAMIXClassScanner ])
-				select: [ :aFamixPackage | 
-					aFamixPackage parentPackage
-						= aFAMIXClassScanner scannedClass parentPackage ] ];
+											select: [ :aFamixPackage | 
+															aFamixPackage parentPackage = aFAMIXClassScanner scannedClass parentPackage ] ];
 		at: 'superclasse'
 			put: [ :aFAMIXClassScanner | aFAMIXClassScanner scannedClass superclass ];
 		at: 'rootClass'
-			put: [ :aFAMIXClassScanner | self computeRootClassFor: aFAMIXClassScanner  ];
+			put:
+				[ :aFAMIXClassScanner | self computeRootClassFor: aFAMIXClassScanner ];
 		at: 'isRoot'
 			put: [ :aFAMIXClassScanner | scannedEntities isaRootClass ];
 		at: 'isMetaRoot'
@@ -60,19 +63,29 @@ FAMIXClassScanner >> defaultMetrics [
 ]
 
 { #category : #VocabularyScanning }
-FAMIXClassScanner >> generateClassNamesScanReport [
-	classNamesScanReport := ClassScanReport new.
-	classNamesScanReport scannedEntity: scannedEntities.
-	self definedMetrics associations do:[:each| classNamesScanReport at: each key ifAbsentPut: (each value value: self)].
-	^classNamesScanReport
+FAMIXClassAnalyser >> generateClassNameReport [
+	report := self reportClass new.
+	report scannedEntity: scannedEntities.
+	self definedMetrics associations
+		do: [ :each | report at: each key ifAbsentPut: (each value value: self) ].
+	^ report
+]
+
+{ #category : #VocabularyScanning }
+FAMIXClassAnalyser >> generateClassNamesScanReport [
+	report := self reportClass new.
+	report scannedEntity: scannedEntities.
+	self definedMetrics associations
+		do: [ :each | report at: each key ifAbsentPut: (each value value: self) ].
+	^ report
 ]
 
 { #category : #accessing }
-FAMIXClassScanner >> scannedClass [
+FAMIXClassAnalyser >> scannedClass [
 	^ self scannedEntities
 ]
 
 { #category : #accessing }
-FAMIXClassScanner >> scannedClass: aFAMIXClass [ 
+FAMIXClassAnalyser >> scannedClass: aFAMIXClass [ 
 	self scannedEntities: aFAMIXClass 
 ]

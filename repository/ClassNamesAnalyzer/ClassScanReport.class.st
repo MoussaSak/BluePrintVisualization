@@ -27,10 +27,10 @@ ClassScanReport >> affectRandomColorsTo: subRootClasses [
 
 { #category : #queries }
 ClassScanReport >> allHierarchySuffixes [
-	^(self at: 'rootClass') classNamesScanReport hierarchieSuffixesAndClasses keys
+	^ (self at: 'rootClass') classNamesScanReport hierarchySuffixesAndClasses keys
 ]
 
-{ #category : #Queries }
+{ #category : #accessing }
 ClassScanReport >> allSubclasses [
 	^self classesGroupedBySuffixes values flatCollect: #yourself.
 ]
@@ -53,7 +53,7 @@ ClassScanReport >> buildHierarchyBlueprintOf: aDicoOfSuffixesAndSubhierarchies u
 	^ view
 ]
 
-{ #category : #Visualisation }
+{ #category : #visualisation }
 ClassScanReport >> classReportViewIn: composite [
 	<gtInspectorPresentationOrder: -10>
 	<moosePresentationOrder: -20>
@@ -77,13 +77,13 @@ ClassScanReport >> classesGroupedBySuffixes [
 ClassScanReport >> classesGroupedBySuffixesAndSubhierarchies [
 	| aDoubleEntryDictionary |
 	aDoubleEntryDictionary := Dictionary new.
-	self hierarchieSuffixesAndClasses associations do: [ :aSuffixAndClasses| | suffix collectionOfClasses | 
+	self hierarchySuffixesAndClasses associations do: [ :aSuffixAndClasses| | suffix collectionOfClasses | 
 		suffix := aSuffixAndClasses key.
 		aDoubleEntryDictionary at: suffix put: Dictionary new.
 		collectionOfClasses := aSuffixAndClasses value.
 		collectionOfClasses do:[:aClass| 
 			|subRoot|
-			subRoot := (aClass at: 'superclasses') reversed at: (aClass indiceOfTheClassInSubHierarchy).
+			subRoot := (aClass at: 'superclasses') reversed at: (aClass indexOfTheClassInSubHierarchy).
 			
 			(aDoubleEntryDictionary at: suffix) at: subRoot ifPresent: [ ((aDoubleEntryDictionary at: suffix) at: subRoot) add: aClass  ] ifAbsent: [  (aDoubleEntryDictionary at: suffix) at: subRoot put: (OrderedCollection with: aClass)] ]
 		].
@@ -96,8 +96,11 @@ ClassScanReport >> createEdgesFor: aClass on: view [
 	"Dont display ingoing edges for subRoot classes"
 	eb := RTEdgeBuilder new.
 	eb view: view.
-	eb shape line width: 0.1; color: (aClass indiceOfTheClassInHierarchy = 1 
-	ifTrue: Color transparent ifFalse: ((Color black adjustBrightness: -0.1) alpha: 0.1)).
+	eb shape 
+		line width: 0.1; 
+		color: (aClass indexOfTheClassInHierarchy = 1 
+						ifTrue: [ Color transparent ]
+						ifFalse: [ ((Color black adjustBrightness: -0.1) alpha: 0.1)] ).
 	eb connectFrom: aClass  to: (aClass at: 'superclasse') classNamesScanReport  
 ]
 
@@ -118,7 +121,7 @@ ClassScanReport >> createLayersFor: aDicoOfSuffixesAndClasses with: dicoOfColors
 				collect: [ :aClassReport | 
 					| supposedSubRoot |
 					supposedSubRoot := ((aClassReport at: 'superclasses') reversed
-						detect: [ :each | each indiceOfTheClassInHierarchy = 1 ]) name.
+						detect: [ :each | each indexOfTheClassInHierarchy = 1 ]) name.
 					
 					(RTElement on: aClassReport)
 						+
@@ -141,10 +144,10 @@ ClassScanReport >> createLayersFor: aDicoOfSuffixesAndClasses with: dicoOfColors
 { #category : #accessing }
 ClassScanReport >> groupOfPackagesScanReport [
 	"Ugly hack. Should be removed once suffixes are grouped in a dedicated report"
-	^self scannedEntity mooseModel allPackages scanClassNames classNamesScanReport
+	^self scannedEntity mooseModel allPackages nameAnalyser classNamesScanReport
 ]
 
-{ #category : #Visualisation }
+{ #category : #visualisation }
 ClassScanReport >> hierarchicalVisualisationWithColeredSuffixes [
 	| b allHierarchyClasses allPackages aDico |
 	aDico := Dictionary new.
@@ -203,21 +206,21 @@ ClassScanReport >> hierarchicalVisualisationWithColeredSuffixes [
 ]
 
 { #category : #queries }
-ClassScanReport >> hierarchieBluePrintViewIn: composite [
+ClassScanReport >> hierarchyBluePrintViewIn: composite [
 	<gtInspectorPresentationOrder: -11>
 	<moosePresentationOrder: -21>
 	composite roassal2
 		title: 'HierarchieBlueprint';
-		initializeView: [ self hierarchieBlueprint ]
+		initializeView: [ self hierarchyBlueprint ]
 
 ]
 
-{ #category : #Visualisation }
-ClassScanReport >> hierarchieBlueprint [
-|  allHierarchieClasses subRootClasses aDico dicoOfVisualElementsIndices dicoOfColors |
-
-	allHierarchieClasses := self hierarchieSuffixesAndClasses values flatCollect: #yourself.
-	subRootClasses := allHierarchieClasses  select: [ :aScanReport | aScanReport indiceOfTheClassInSubHierarchy = 1 ].
+{ #category : #visualisation }
+ClassScanReport >> hierarchyBlueprint [
+	
+	| allHierarchieClasses subRootClasses aDico dicoOfVisualElementsIndices dicoOfColors |
+	allHierarchieClasses := self hierarchySuffixesAndClasses values flatCollect: #yourself.
+	subRootClasses := allHierarchieClasses  select: [ :aScanReport | aScanReport indexOfTheClassInSubHierarchy = 1 ].
 	dicoOfColors := self affectRandomColorsTo: subRootClasses.
 	aDico := self classesGroupedBySuffixesAndSubhierarchies.
 	dicoOfVisualElementsIndices := self affectIndicesToSubhierarchyClasses: aDico.
@@ -227,7 +230,7 @@ ClassScanReport >> hierarchieBlueprint [
 ]
 
 { #category : #accessing }
-ClassScanReport >> hierarchieSuffixesAndClasses [
+ClassScanReport >> hierarchySuffixesAndClasses [
 	| allHierarchieClasses dico |
 	dico := Dictionary new.
 	allHierarchieClasses := ((self at: 'rootClass' )allSubInheritances collect: [:anAssociation | anAssociation from classNamesScanReport]) addFirst: (self at: 'rootClass') classNamesScanReport;yourself.
@@ -238,23 +241,23 @@ ClassScanReport >> hierarchieSuffixesAndClasses [
 ]
 
 { #category : #queries }
-ClassScanReport >> indiceOfTheClassInHierarchy [
+ClassScanReport >> indexOfTheClassInHierarchy [
 	| indiceOfSuperclass subclassesWithSameSuffix aDico i mySuffix subclassesWithSameSuffixIndices myIndice |
 	
-	^self at: 'indiceOfTheClassInHierarchy' ifAbsent:[
+	^self at: #indexOfTheClassInHierarchy ifAbsent:[
 		
-	(self indiceOfTheClassInSubHierarchy = 1) ifTrue: [^self at: 'indiceOfTheClassInHierarchy' put: 1].
-	indiceOfSuperclass := (self at: 'superclasse') indiceOfTheClassInHierarchy.
+	(self indexOfTheClassInSubHierarchy = 1) ifTrue: [^self at: #indexOfTheClassInHierarchy put: 1].
+	indiceOfSuperclass := (self at: 'superclasse') indexOfTheClassInHierarchy.
 	mySuffix := self at: 'classSuffix'.
 	subclassesWithSameSuffix := ((self at: 'rootClass') allSubInheritances collect: [:each | each from classNamesScanReport]) select: [:each | (each at: 'classSuffix') = mySuffix].
-	subclassesWithSameSuffixIndices := subclassesWithSameSuffix collect: [ :each | each at: 'indiceOfTheClassInHierarchy' ifAbsent: 0 ].
+	subclassesWithSameSuffixIndices := subclassesWithSameSuffix collect: [ :each | each at: #indexOfTheClassInHierarchy ifAbsent: 0 ].
 	
 	myIndice := (subclassesWithSameSuffixIndices max max: indiceOfSuperclass) + 1.	
-	^self at: 'indiceOfTheClassInHierarchy' put: myIndice ]
+	^self at: #indexOfTheClassInHierarchy put: myIndice ]
 ]
 
 { #category : #queries }
-ClassScanReport >> indiceOfTheClassInSubHierarchy [
+ClassScanReport >> indexOfTheClassInSubHierarchy [
 	"answers the order of the class in the subhierarchy of its suffix.
 	"
 	| i j superclasses |
@@ -267,14 +270,18 @@ ClassScanReport >> indiceOfTheClassInSubHierarchy [
 	^ j
 ]
 
-{ #category : #Visualisation }
+{ #category : #visualisation }
 ClassScanReport >> mouseAnnouncer [
 	^RTClassScanReportPopup new text: self viewInClassBluePrint; alphaPopupBackground: 0.7; textColor: Color green; backgroundColor: Color black
 ]
 
-{ #category : #Visualisation }
+{ #category : #visualisation }
 ClassScanReport >> mouseAnnouncerWithoutSubclasses [
-	^RTClassScanReportPopupWithoutSubclasses new text: self viewInClassBluePrint; alphaPopupBackground: 0.7; textColor: Color green; backgroundColor: Color black
+	^ RTClassScanReportPopupWithoutSubclasses new 
+			text: self viewInClassBluePrint; 
+			alphaPopupBackground: 0.7; 
+			textColor: Color green; 
+			backgroundColor: Color black
 ]
 
 { #category : #'visualization-private' }
@@ -291,7 +298,7 @@ ClassScanReport >> nestLayers: layers with: dicoOfVisualElementsIndices [
 				classScanReport := anElement model.
 				indiceOfSubHierarchy := dicoOfVisualElementsIndices at: (classScanReport at: 'className').
 				x := indiceOfSubHierarchy  -1 * 2 + (3/2).
-				y := classScanReport indiceOfTheClassInHierarchy - 1 * 2 + (3/2).
+				y := classScanReport indexOfTheClassInHierarchy - 1 * 2 + (3/2).
 				anElement trachelShape position: layer key encompassingRectangle origin + (x@y).
 				 ]
 			]
@@ -312,9 +319,9 @@ ClassScanReport >> orderSuffixesAccordingToLongestSubHierarchy: aDicoOfSuffixesA
 		sort: [ :first :second | 
 			| firstSuffixIndiceOfClasses secondSuffixIndiceOfClasses |
 			firstSuffixIndiceOfClasses := ((aDicoOfSuffixesAndClasses at: first)
-				collect: #indiceOfTheClassInHierarchy) max.
+				collect: #indexOfTheClassInHierarchy) max.
 			secondSuffixIndiceOfClasses := ((aDicoOfSuffixesAndClasses at: second)
-				collect: #indiceOfTheClassInHierarchy) max.
+				collect: #indexOfTheClassInHierarchy) max.
 			firstSuffixIndiceOfClasses > secondSuffixIndiceOfClasses ]) asOrderedCollection.
 	suffixWithRootClass := orderedSuffixes detect: [:each | ((aDicoOfSuffixesAndClasses at: each) detect: [ :aClassScanReport | aClassScanReport at: 'isRoot'] ifNone: [ nil ] ) isNotNil ] ifNone: [Exception with: 'very funny no Root in the hierarchy'].
 		orderedSuffixes remove: (suffixWithRootClass).
@@ -342,19 +349,32 @@ ClassScanReport >> scannedClass [
 ClassScanReport >> setDimentionsOf: aCollection [ 
 
 	| height |
-	height := ((aCollection flatCollect: #value) collect: [:element| element model indiceOfTheClassInHierarchy ]) max * 2 + 1.
+	height := ((aCollection flatCollect: #value) collect: [:element| element model indexOfTheClassInHierarchy ]) max * 2 + 1.
 	aCollection do: [ :layer|
 		| numberOfSubhierarchies width |
-		numberOfSubhierarchies := (layer value select: [ :element| element model indiceOfTheClassInHierarchy = 1 ]) size.
+		numberOfSubhierarchies := (layer value select: [ :element| element model indexOfTheClassInHierarchy = 1 ]) size.
 		width := numberOfSubhierarchies * 2 + 1.
 		layer key  height: height.
 		layer key width: width
 		 ]
 ]
 
-{ #category : #Visualisation }
+{ #category : #visualisation }
 ClassScanReport >> viewInClassBluePrint [
-	^'className: ',(self at: 'className'), String cr,
-	 'superclass: ',(self at: 'superclasses') name, String cr,
-	 'Root Class: ',(self at: 'rootClass') name. 
+	^ String streamContents: [ :s | 
+		s 
+			<< 'className: ';
+			<<(self at: 'className');
+			cr; 
+			<< 'superclass: '.
+		self flag: #toFix. "this should not be nil. Patch for now"
+		((self at: 'superclasses') respondsTo: #name)
+			ifTrue: [ :e | s << e name].
+		s	
+			cr;
+			<< 'Root Class: ';
+			<< (self at: 'rootClass') name. 
+			]
+
+	
 ]

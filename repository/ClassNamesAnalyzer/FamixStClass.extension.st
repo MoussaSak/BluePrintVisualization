@@ -11,11 +11,11 @@ FamixStClass >> isaRootClass [
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FamixStClass >> rootClass [
-	^self superclasses first.
+FamixStClass >> nameAnalyser [
+	^FAMIXClassAnalyser scan: self
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FamixStClass >> scanClassNames [
-	^FAMIXClassScanner scan: self
+FamixStClass >> rootClass [
+	^self superclasses first.
 ]

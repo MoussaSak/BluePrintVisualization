@@ -1,6 +1,10 @@
+"
+I'm an name analyser. I'm specialised to handle group of packages.
+In particular I have subentity (package groups).
+"
 Class {
-	#name : #FAMIXPackagesGroupScanner,
-	#superclass : #VocabularyScanner,
+	#name : #FAMIXPackagesGroupAnalyser,
+	#superclass : #AbstractClassNameAnalyser,
 	#instVars : [
 		'availableColors'
 	],
@@ -8,24 +12,18 @@ Class {
 }
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner class >> allColors [
+FAMIXPackagesGroupAnalyser class >> allColors [
 	^(((Color colorNamesXKCD collect:#second) reject: [ :each|each size<3 ] )collect: [ :each|
 	Color fromRgbTriplet: each ])
 ]
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner class >> reportClass [
+FAMIXPackagesGroupAnalyser class >> reportClass [
 	^GroupOfPackagesScanReport
 ]
 
-{ #category : #'instance-creation' }
-FAMIXPackagesGroupScanner class >> scan: aFAMIXPackageGroup [ 
-	"^(self new scannedEntities: aFAMIXPackageGroup) generateaClassNamesScanReport;yourself."
-	^super scan: aFAMIXPackageGroup 
-]
-
 { #category : #'visualization-private' }
-FAMIXPackagesGroupScanner >> addBlueprintLegendOn: view [
+FAMIXPackagesGroupAnalyser >> addBlueprintLegendOn: view [
 
 	| lb |
 	lb := RTLegendBuilder new.
@@ -39,57 +37,57 @@ FAMIXPackagesGroupScanner >> addBlueprintLegendOn: view [
 ]
 
 { #category : #queries }
-FAMIXPackagesGroupScanner >> allCoherentHierarchies [
+FAMIXPackagesGroupAnalyser >> allCoherentHierarchies [
 	^self allHierarchies select: [:each | each allHierarchySuffixes size = 1].
 ]
 
 { #category : #queries }
-FAMIXPackagesGroupScanner >> allCoherentSuffixes [
+FAMIXPackagesGroupAnalyser >> allCoherentSuffixes [
 	^self allSuffixes select: [ :each | each value hierarchies asSet size = 1 ]
 ]
 
 { #category : #queries }
-FAMIXPackagesGroupScanner >> allHierarchies [
+FAMIXPackagesGroupAnalyser >> allHierarchies [
 	^((self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses') reject: [ :each | each value classNamesScanReport at: 'isMetaRoot']) collect: [ :each | each value classNamesScanReport ].
 ]
 
 { #category : #queries }
-FAMIXPackagesGroupScanner >> allInCoherentSuffixes [
+FAMIXPackagesGroupAnalyser >> allInCoherentSuffixes [
 	^self allSuffixes select:  [ :each| each value hierarchies asSet size > 1 ]
 ]
 
 { #category : #queries }
-FAMIXPackagesGroupScanner >> allIncoherentHierarchies [
+FAMIXPackagesGroupAnalyser >> allIncoherentHierarchies [
 	^self allHierarchies select: [:each | each allHierarchySuffixes size > 1].
 ]
 
 { #category : #queries }
-FAMIXPackagesGroupScanner >> allMultiClassCoherentHierarchies [
+FAMIXPackagesGroupAnalyser >> allMultiClassCoherentHierarchies [
 	^self allMultiClassHierarchies select: [ :each| each allHierarchySuffixes size = 1 ]
 ]
 
 { #category : #queries }
-FAMIXPackagesGroupScanner >> allMultiClassCoherentSuffixes [
+FAMIXPackagesGroupAnalyser >> allMultiClassCoherentSuffixes [
 	^self allMultiClassSuffixes select: [ :each| each value hierarchies asSet size = 1 ]
 ]
 
 { #category : #queries }
-FAMIXPackagesGroupScanner >> allMultiClassHierarchies [
+FAMIXPackagesGroupAnalyser >> allMultiClassHierarchies [
 	^self allHierarchies select: [ :each | each scannedEntity allSubInheritances size >= 1 ]
 ]
 
 { #category : #queries }
-FAMIXPackagesGroupScanner >> allMultiClassSuffixes [
+FAMIXPackagesGroupAnalyser >> allMultiClassSuffixes [
 	^self allSuffixes select: [ :each | each key > 1 ]
 ]
 
 { #category : #queries }
-FAMIXPackagesGroupScanner >> allSuffixes [
+FAMIXPackagesGroupAnalyser >> allSuffixes [
 	^self classNamesScanReport at: 'allClassNameSuffixesSorted'.
 ]
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner >> computeAllClassNameSuffixesSorted [
+FAMIXPackagesGroupAnalyser >> computeAllClassNameSuffixesSorted [
 	| suffixScanReports |
 	suffixScanReports := ((self classNamesScanReport subEntityScanReports
 		collect:
@@ -99,7 +97,7 @@ FAMIXPackagesGroupScanner >> computeAllClassNameSuffixesSorted [
 ]
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner >> computeAllClassesGroupedByRootClassesFor: aGroupOfScanReports [
+FAMIXPackagesGroupAnalyser >> computeAllClassesGroupedByRootClassesFor: aGroupOfScanReports [
 	| aDictionary |
 	aDictionary := Dictionary new.
 	(self classNamesScanReport
@@ -120,7 +118,7 @@ FAMIXPackagesGroupScanner >> computeAllClassesGroupedByRootClassesFor: aGroupOfS
 ]
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner >> computeAllRootClassesAsSetFor: aGroupOfScanReports [
+FAMIXPackagesGroupAnalyser >> computeAllRootClassesAsSetFor: aGroupOfScanReports [
 	^ (self classNamesScanReport
 		at: 'allRootClassesSortedByNumberOfSubClasses'
 		ifAbsentPut: [ (self defaultMetrics at: 'allRootClassesSortedByNumberOfSubClasses')
@@ -128,7 +126,7 @@ FAMIXPackagesGroupScanner >> computeAllRootClassesAsSetFor: aGroupOfScanReports 
 ]
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner >> computeColorsOfRootClassesFor: aGroupOfScanReports [
+FAMIXPackagesGroupAnalyser >> computeColorsOfRootClassesFor: aGroupOfScanReports [
 	| i aDictionaryOfColors |
 	aDictionaryOfColors := self scannedEntities mooseModel
 		dictionaryOfRootClassColors
@@ -157,7 +155,7 @@ FAMIXPackagesGroupScanner >> computeColorsOfRootClassesFor: aGroupOfScanReports 
 ]
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner >> computeDominantRootsInSuffixFor: aGroupOfScanReports [
+FAMIXPackagesGroupAnalyser >> computeDominantRootsInSuffixFor: aGroupOfScanReports [
 	^ ((self classNamesScanReport
 		at: 'hierarchiesGroupedBySuffixes'
 		ifAbsentPut: [ (self defaultMetrics at: 'hierarchiesGroupedBySuffixes')
@@ -167,7 +165,7 @@ FAMIXPackagesGroupScanner >> computeDominantRootsInSuffixFor: aGroupOfScanReport
 ]
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner >> computeHierarchiesGrouperBySuffixesFor: aGroupOfScanReports [
+FAMIXPackagesGroupAnalyser >> computeHierarchiesGrouperBySuffixesFor: aGroupOfScanReports [
 	^ ((self classNamesScanReport
 		at: 'allClassNameSuffixesSorted'
 		ifAbsentPut: [ (self defaultMetrics at: 'allClassNameSuffixesSorted')
@@ -178,7 +176,7 @@ FAMIXPackagesGroupScanner >> computeHierarchiesGrouperBySuffixesFor: aGroupOfSca
 ]
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner >> computeSuffixesGroupedByRootClassesFor: aGroupOfScanReports [
+FAMIXPackagesGroupAnalyser >> computeSuffixesGroupedByRootClassesFor: aGroupOfScanReports [
 	| aDictionary |
 	aDictionary := Dictionary new.
 	^ (self classNamesScanReport
@@ -191,7 +189,7 @@ FAMIXPackagesGroupScanner >> computeSuffixesGroupedByRootClassesFor: aGroupOfSca
 ]
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner >> defaultMetrics [
+FAMIXPackagesGroupAnalyser >> defaultMetrics [
 	^ Dictionary new
 		at: 'numberOfPackages'
 			put: [ :aGroupOfScanReports | aGroupOfScanReports size ];
@@ -211,16 +209,7 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 			put:
 				[ :aGroupOfScanReports | self computeHierarchiesGrouperBySuffixesFor: aGroupOfScanReports ];
 		at: 'allClassNameSuffixesSorted'
-			put: [ :aGroupOfScanReports | 
-			"|aDictionary|
-			aDictionary := Dictionary new.
-(self classNamesScanReport at: 'allRootClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClasses') value: aGroupOfScanReports]) collect: [:association|
-	|suffix rootClass|
-	suffix := association value at: 'classSuffix'.
-	rootClass := association key.
-	aDictionary at: suffix ifPresent: [(aDictionary at: suffix) add: rootClass ] ifAbsentPut: [Bag with: rootClass] ].
-	aDictionary"
-			self computeAllClassNameSuffixesSorted ];
+			put: [ :aGroupOfScanReports | self computeAllClassNameSuffixesSorted ];
 		at: 'dominantRootsInSuffix'
 			put:
 				[ :aGroupOfScanReports | self computeDominantRootsInSuffixFor: aGroupOfScanReports ];
@@ -246,7 +235,7 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 ]
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner >> generateCSVFor: aProject [
+FAMIXPackagesGroupAnalyser >> generateCSVFor: aProject [
 	| stream anOutputFileName |
 	
 	anOutputFileName := aProject, Date today yyyymmdd, Time now hhmm24,'.txt'.
@@ -291,40 +280,40 @@ self allHierarchies do: [ :aHierarchyScanReport|
 ]
 
 { #category : #accessing }
-FAMIXPackagesGroupScanner >> groupOfPackagesScanReport [
+FAMIXPackagesGroupAnalyser >> groupOfPackagesScanReport [
 	^ self classNamesScanReport
 ]
 
 { #category : #accessing }
-FAMIXPackagesGroupScanner >> initialize [
+FAMIXPackagesGroupAnalyser >> initialize [
 	super initialize.
 	availableColors := self class allColors
 ]
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner >> pickAnAvailableColorNumber: indexOfColors [
+FAMIXPackagesGroupAnalyser >> pickAnAvailableColorNumber: indexOfColors [
 "Color grey: 1 is used for Meta Root classes"
 	indexOfColors <= (availableColors size) ifTrue:[^availableColors at: indexOfColors]
 	ifFalse:[ ^Color gray: indexOfColors / (availableColors size) ]
 ]
 
 { #category : #'instance-creation' }
-FAMIXPackagesGroupScanner >> saveInMooseModel: aDictionaryOfColors [
+FAMIXPackagesGroupAnalyser >> saveInMooseModel: aDictionaryOfColors [
 	self scannedPackages mooseModel dictionaryOfRootClassColors: aDictionaryOfColors.
 	^aDictionaryOfColors
 ]
 
 { #category : #accessing }
-FAMIXPackagesGroupScanner >> scannedPackages [
+FAMIXPackagesGroupAnalyser >> scannedPackages [
 	^ self scannedEntities
 ]
 
 { #category : #accessing }
-FAMIXPackagesGroupScanner >> scannedPackages: aFAMIXPackageGroup [ 
+FAMIXPackagesGroupAnalyser >> scannedPackages: aFAMIXPackageGroup [ 
 	self scannedEntities: aFAMIXPackageGroup 
 ]
 
 { #category : #accessing }
-FAMIXPackagesGroupScanner >> subEntities [
+FAMIXPackagesGroupAnalyser >> subEntities [
 	^self scannedPackages.
 ]

@@ -1,16 +1,19 @@
+"
+I'm an name analyser. I'm specialised to handle a package.
+"
 Class {
-	#name : #FAMIXStPackageScanner,
-	#superclass : #VocabularyScanner,
+	#name : #FAMIXPackageAnalyser,
+	#superclass : #AbstractClassNameAnalyser,
 	#category : #'ClassNamesAnalyzer-Core'
 }
 
-{ #category : #'instance-creation' }
-FAMIXStPackageScanner class >> reportClass [
+{ #category : #'as yet unclassified' }
+FAMIXPackageAnalyser class >> reportClass [
 	^PackageScanReport
 ]
 
-{ #category : #accesing }
-FAMIXStPackageScanner >> defaultMetrics [
+{ #category : #accessing }
+FAMIXPackageAnalyser >> defaultMetrics [
 	
 	^ Dictionary new
 		at: 'numberOfPackages' put: [ :argh | 1 ];
@@ -83,7 +86,7 @@ FAMIXStPackageScanner >> defaultMetrics [
 				collect: #value ];
 		at: 'allRootClasses'
 			put:
-				[ :aSingleClassScanReports | aSingleClassScanReports collect: [ :aSingleClassScanReport | (aSingleClassScanReport at: 'rootClass')->(aSingleClassScanReport) ] ];
+				[ :aSingleClassScanReports | aSingleClassScanReports collect: [ :aSingleClassScanReport | (aSingleClassScanReport at: 'rootClass') -> aSingleClassScanReport ] ];
 		at: 'allRootClassesAsaSet'
 			put: [ :aSingleClassScanReports | 
 			(self classNamesScanReport
@@ -92,17 +95,28 @@ FAMIXStPackageScanner >> defaultMetrics [
 		yourself
 ]
 
-{ #category : #Accessing }
-FAMIXStPackageScanner >> scannedPackage [
+{ #category : #accessing }
+FAMIXPackageAnalyser >> groupOfPackagesScanReport [
+	"Ugly hack. Should be removed once suffixes are grouped in a dedicated report"
+	^self scannedEntities mooseModel allPackages vocabularyScanner classNamesScanReport
+]
+
+{ #category : #accessing }
+FAMIXPackageAnalyser >> scannedPackage [
 	^ self scannedEntities
 ]
 
 { #category : #accessing }
-FAMIXStPackageScanner >> scannedPackages [
+FAMIXPackageAnalyser >> scannedPackage: aFAMIXPackage [ 
+	self scannedEntities: aFAMIXPackage
+]
+
+{ #category : #accessing }
+FAMIXPackageAnalyser >> scannedPackages [
 	^{self scannedPackage}.
 ]
 
 { #category : #accessing }
-FAMIXStPackageScanner >> subEntities [
+FAMIXPackageAnalyser >> subEntities [
 	^self scannedPackage classes
 ]

@@ -1,42 +1,41 @@
+"
+I'm an analyser. I analyse classes, package or groups of packages and I create object representing my name analysis. 
+In addition I'm reponsible for drawing visualisation that use the report objects I created.
+"
 Class {
-	#name : #VocabularyScanner,
+	#name : #AbstractClassNameAnalyser,
 	#superclass : #Object,
 	#instVars : [
-		'classNamesScanReport',
 		'scannedEntities',
 		'definedMetrics',
-		'showInheritanceRelationships'
+		'showInheritanceRelationships',
+		'report'
 	],
 	#category : #'ClassNamesAnalyzer-Core'
 }
 
-{ #category : #'as yet unclassified' }
-VocabularyScanner class >> defaultMetrics [
+{ #category : #'instance-creation' }
+AbstractClassNameAnalyser class >> reportClass [
 	^self subclassResponsibility
 ]
 
 { #category : #'instance-creation' }
-VocabularyScanner class >> reportClass [
-	^self subclassResponsibility
-]
-
-{ #category : #'instance-creation' }
-VocabularyScanner class >> scan: aFAMIXPackageGroup [ 
-	|aVocabularyScanner|
-	
-	aVocabularyScanner := (self new scannedEntities: aFAMIXPackageGroup) generateClassNamesScanReport;yourself.
-	aFAMIXPackageGroup vocabularyScanner: aVocabularyScanner.
-	^aVocabularyScanner
+AbstractClassNameAnalyser class >> scan: aFAMIXPackageGroup [
+ 
+	| aVocabularyAnalyser |
+	aVocabularyAnalyser := (self new scannedEntities: aFAMIXPackageGroup) generateClassNamesScanReport; yourself.
+	aFAMIXPackageGroup vocabularyScanner: aVocabularyAnalyser.
+	^ aVocabularyAnalyser
 ]
 
 { #category : #metrics }
-VocabularyScanner >> addMetric: metricName with: aBlock [
+AbstractClassNameAnalyser >> addMetric: metricName with: aBlock [
 	definedMetrics at: metricName put: aBlock
 	
 ]
 
 { #category : #metrics }
-VocabularyScanner >> allClassNameSuffixesSorted: suffixScanReports [
+AbstractClassNameAnalyser >> allClassNameSuffixesSorted: suffixScanReports [
 
 	| agregatedSuffixScanReports |
 	agregatedSuffixScanReports := OrderedCollection new.
@@ -60,28 +59,24 @@ VocabularyScanner >> allClassNameSuffixesSorted: suffixScanReports [
 ]
 
 { #category : #visualisations }
-VocabularyScanner >> classBluePrint [
+AbstractClassNameAnalyser >> classBluePrint [
 
-	^ classNamesScanReport
+	^ report
 		at: 'classBlueprint'
 		ifAbsentPut: [ self computeClassBlueprint ]
 ]
 
 { #category : #accessing }
-VocabularyScanner >> classNamesScanReport [
-	^ classNamesScanReport
+AbstractClassNameAnalyser >> classNamesScanReport [
+	^ report
 ]
 
 { #category : #compute }
-VocabularyScanner >> computeClassBlueprint [
-	| sortedRootClasses b delay |
+AbstractClassNameAnalyser >> computeClassBlueprint [
+	| sortedRootClasses b |
 	b := RTMondrian new.
-	sortedRootClasses := (self classNamesScanReport
-		at: 'allRootClassesSortedByNumberOfSubClasses') collect: #value.
+	sortedRootClasses := (self classNamesScanReport at: 'allRootClassesSortedByNumberOfSubClasses') collect: #value.
 	b shape rectangle withTextAbove.
-	"	b shape color: [ :each| Color white ];
-	borderColor: [ :aPackage| Color gray ] .
-"
 	b
 		nodes: self scannedPackages
 		forEach: [ :aSinglePackage | 
@@ -97,7 +92,7 @@ VocabularyScanner >> computeClassBlueprint [
 						value.
 					"if DictionaryOfColors is nil this means that the group of packages has not been scanned yet. Then scan it"
 					self dictionaryOfColors
-						ifNil: [ self scannedEntities mooseModel allPackages scanClassNames ].
+						ifNil: [ self scannedEntities mooseModel allPackages nameAnalyser ].
 					(self dictionaryOfColors at: dominantClasse)
 						adjustGray: aSuffix hierarchies asSet size	"alpha: ((aSuffix value dominantHierarchieInPackages select: [ :each| each value >= aSuffix value dominanceLevel ]) size / aSuffix value dominantHierarchieInPackages size)" ];
 				withTextAbove: [ :each | each value suffix ];
@@ -148,37 +143,43 @@ VocabularyScanner >> computeClassBlueprint [
 				do: [ :each | element announcer subscriptions subscriptions remove: each ] ].
 	"b view elements do: [ :element| element @ (element model mouseAnnouncer)]"
 	b shape line color: (Color white alpha: 0.05).
-
-	showInheritanceRelationships ifTrue: [ self displayInheritanceRelationsOn: b ].
-	
+	showInheritanceRelationships
+		ifTrue: [ self displayInheritanceRelationsOn: b ].
 	^ b
 ]
 
+{ #category : #'vocabulary scanning' }
+AbstractClassNameAnalyser >> computeReportsForSubEntities [
+
+	^ self subEntities collect: [ :each |  each nameAnalyser classNamesScanReport]
+
+]
+
 { #category : #initialization }
-VocabularyScanner >> defaultMetrics [
+AbstractClassNameAnalyser >> defaultMetrics [
 	^ self subclassResponsibility 
 ]
 
 { #category : #metrics }
-VocabularyScanner >> definedMetricNames [
+AbstractClassNameAnalyser >> definedMetricNames [
 	^ definedMetrics allKeys
 	
 ]
 
 { #category : #metrics }
-VocabularyScanner >> definedMetrics [
+AbstractClassNameAnalyser >> definedMetrics [
 	^ definedMetrics
 	
 ]
 
 { #category : #utils }
-VocabularyScanner >> dictionaryOfColors [
+AbstractClassNameAnalyser >> dictionaryOfColors [
 
 	^ self scannedEntities mooseModel dictionaryOfRootClassColors
 ]
 
 { #category : #compute }
-VocabularyScanner >> displayInheritanceRelationsOn: b [ 
+AbstractClassNameAnalyser >> displayInheritanceRelationsOn: b [ 
 
 	b edges: ((self classNamesScanReport at: 'allClasses') collect: [ :each | each vocabularyScanner classNamesScanReport ])
 		from: #yourself
@@ -188,42 +189,49 @@ VocabularyScanner >> displayInheritanceRelationsOn: b [
 ]
 
 { #category : #'vocabulary scanning' }
-VocabularyScanner >> generateClassNamesScanReport [
+AbstractClassNameAnalyser >> generateClassNamesScanReport [
 	| subEntityScanReports |
-	classNamesScanReport := self reportClass new.
-	classNamesScanReport scannedEntity: scannedEntities.
-	subEntityScanReports := (self subEntities collect: #scanClassNames) collect: #classNamesScanReport.
-	classNamesScanReport subEntityScanReports: subEntityScanReports.
-	self definedMetrics associations do:[:each| 
-		classNamesScanReport at: each key ifAbsentPut: (each value value: (subEntityScanReports))].
-	^classNamesScanReport.
+	
+	report := self reportClass new.
+	report scannedEntity: scannedEntities.
+	
+	subEntityScanReports := self computeReportsForSubEntities.
+	report subEntityScanReports: subEntityScanReports.
+	
+	"Here we compute the value of the state of the whole based on the subelement values"
+	self definedMetrics associations 
+		do: [ :each | 
+				report 
+					at: each key 
+					ifAbsentPut: (each value value: subEntityScanReports)].
+	^ report.
 
 ]
 
 { #category : #initialization }
-VocabularyScanner >> initialize [
+AbstractClassNameAnalyser >> initialize [
 	super initialize.
 	definedMetrics := self defaultMetrics.
 	showInheritanceRelationships := false
 ]
 
 { #category : #metrics }
-VocabularyScanner >> removeMetrics: metricName [
+AbstractClassNameAnalyser >> removeMetrics: metricName [
 	definedMetrics removeKey: metricName ifAbsent: [  ]
 	
 ]
 
 { #category : #accessing }
-VocabularyScanner >> reportClass [
+AbstractClassNameAnalyser >> reportClass [
 	^self class reportClass
 ]
 
 { #category : #accessing }
-VocabularyScanner >> scannedEntities [
+AbstractClassNameAnalyser >> scannedEntities [
 	^ scannedEntities
 ]
 
 { #category : #accessing }
-VocabularyScanner >> scannedEntities: aFAMIXClassOrPackageOrPackageGroup [ 
+AbstractClassNameAnalyser >> scannedEntities: aFAMIXClassOrPackageOrPackageGroup [ 
 	scannedEntities := aFAMIXClassOrPackageOrPackageGroup
 ]

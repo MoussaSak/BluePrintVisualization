@@ -2,7 +2,12 @@
 I'm a little script to create a model without all the unnecessary information. 
 We just need to have class, package and inheritance. 
 
-	RunnableExamples loadInMooseHierarchyOf: ComposablePresenter
+	| packages view |
+	
+	packages := (RunnableExamples loadInMooseHierarchyOf: ComposablePresenter) allModelPackages.
+	view := packages vocabularyScanner classBluePrint.
+	view @ RTDraggableView.
+	view openWithToolbarEntitled: 'self title'
 "
 Class {
 	#name : #RunnableExamples,

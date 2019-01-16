@@ -5,8 +5,9 @@ FAMIXPackageGroup >> addClassBlueprintLegendOn: view [
 	| lb |
 	lb := RTLegendBuilder new.
 	"lb onDemand."
+	self flag: #toFix. "This duplicated code it means that an entity is missing to which we should dispatch."
 	lb view: view.
-	lb addColor: Color white text: 'Sigle class hierarchy'.
+	lb addColor: Color white text: 'Single class hierarchy'.
 	lb addColor: Color gray text: 'Single suffix hierarchy'.
 	((self vocabularyScanner classNamesScanReport at: 'allRootClasses') asSet collect: #key)
 		do: [ :each | 
@@ -18,30 +19,34 @@ FAMIXPackageGroup >> addClassBlueprintLegendOn: view [
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
+FAMIXPackageGroup >> nameAnalyser [
+	^FAMIXPackagesGroupAnalyser scan: self.
+]
+
+{ #category : #'*ClassNamesAnalyzer' }
 FAMIXPackageGroup >> packageViewIn: composite [
 	<gtInspectorPresentationOrder: -10>
 	<moosePresentationOrder: -20>
 	composite roassal2
-		title: '66NameBlueprint';
+		title: 'PGNameBlueprint';
 		initializeView: [ | view |
+		
 			view := self vocabularyScanner classBluePrint.
 			self addClassBlueprintLegendOn: view view.
 			view ]
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
-FAMIXPackageGroup >> scanClassNames [
-	^FAMIXPackagesGroupScanner scan: self.
-]
-
-{ #category : #'*ClassNamesAnalyzer' }
 FAMIXPackageGroup >> vocabularyScanner [
-|a|
-a := 
-	self privateState attributeAt: #vocabularyScanner ifAbsentPut: (nil).
-	a ifNil: [ a := (self privateState attributeAt: #vocabularyScanner put: (FAMIXPackagesGroupScanner scan: self)) value ].
-	
-	^a
+	| a |
+	a := self privateState
+		attributeAt: #vocabularyScanner
+		ifAbsentPut: [nil].
+	a
+		ifNil: [ a := (self privateState
+				attributeAt: #vocabularyScanner
+				put: (FAMIXPackagesGroupAnalyser scan: self)) value ].
+	^ a
 ]
 
 { #category : #'*ClassNamesAnalyzer' }
