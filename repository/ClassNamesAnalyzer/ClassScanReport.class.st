@@ -355,6 +355,6 @@ ClassScanReport >> setDimentionsOf: aCollection [
 { #category : #Visualisation }
 ClassScanReport >> viewInClassBluePrint [
 	^'className: ',(self at: 'className'), String cr,
-	 'superclass: ',(self at: 'superclasse') name, String cr,
+	 'superclass: ',(self at: 'superclasses') name, String cr,
 	 'Root Class: ',(self at: 'rootClass') name. 
 ]

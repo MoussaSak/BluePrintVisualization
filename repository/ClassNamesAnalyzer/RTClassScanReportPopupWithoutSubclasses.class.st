@@ -15,7 +15,7 @@ RTClassScanReportPopupWithoutSubclasses >> initializeElement: element [
 					[ :each | each colorEdgesToSuperClassesIn: Color red whenEntring: true ].
 			element incomingEdges
 				do:
-					[ :each | each colorEdgesFromSubClassesIn: Color blue whenEntring: true ] ]
+					[ :each | each colorEdgesFromSubClassesIn: Color blue whenEntring: true ] ].
 	element
 		when: TRMouseLeave
 		do: [ :event | 
