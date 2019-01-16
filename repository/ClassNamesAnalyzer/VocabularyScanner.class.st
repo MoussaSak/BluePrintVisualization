@@ -60,11 +60,21 @@ VocabularyScanner >> allClassNameSuffixesSorted: suffixScanReports [
 
 { #category : #visualisations }
 VocabularyScanner >> classBluePrint [
-	| b  delay |
+
 	^ classNamesScanReport
 		at: 'classBlueprint'
-		ifAbsentPut: [ 
-			| sortedRootClasses |
+		ifAbsentPut: [ self computeClassBlueprint ]
+]
+
+{ #category : #accessing }
+VocabularyScanner >> classNamesScanReport [
+	^ classNamesScanReport
+]
+
+{ #category : #'as yet unclassified' }
+VocabularyScanner >> computeClassBlueprint [
+
+	| sortedRootClasses b delay |
 			b := RTMondrian new.
 			delay := Time now.
 			"TimeProfiler spyOn:["
@@ -91,8 +101,7 @@ VocabularyScanner >> classBluePrint [
 								value.
 							"if DictionaryOfColors is nil this means that the group of packages has not been scanned yet. Then scan it"
 							self dictionaryOfColors
-								ifNil:
-									[ self scannedEntities mooseModel allPackages scanClassNames ].
+								ifNil: [ self scannedEntities mooseModel allPackages scanClassNames ].
 							(self dictionaryOfColors at: dominantClasse)
 								adjustGray: aSuffix hierarchies asSet size	"alpha: ((aSuffix value dominantHierarchieInPackages select: [ :each| each value >= aSuffix value dominanceLevel ]) size / aSuffix value dominantHierarchieInPackages size)" ];
 						withTextAbove: [ :each | each value suffix ];
@@ -140,8 +149,7 @@ VocabularyScanner >> classBluePrint [
 			b view elements
 				do: [ :element | 
 					element announcer subscriptions subscriptions
-						do:
-							[ :each | element announcer subscriptions subscriptions remove: each ] ].
+						do: [ :each | element announcer subscriptions subscriptions remove: each ] ].
 			"b view elements do: [ :element| element @ (element model mouseAnnouncer)]"
 			b shape line color: (Color white alpha: 0.05).
 			b
@@ -156,12 +164,7 @@ VocabularyScanner >> classBluePrint [
 			Transcript
 				show: (Time now asSeconds - delay asSeconds) asString;
 				cr.
-			^ b ]
-]
-
-{ #category : #accessing }
-VocabularyScanner >> classNamesScanReport [
-	^ classNamesScanReport
+			^ b
 ]
 
 { #category : #initialization }

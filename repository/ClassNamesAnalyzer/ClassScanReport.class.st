@@ -1,7 +1,7 @@
 Class {
 	#name : #ClassScanReport,
 	#superclass : #VocabularyScanReport,
-	#category : #'ClassNamesAnalyzer-Reports'
+	#category : #'ClassNamesAnalyzer-Core'
 }
 
 { #category : #'visualization-private' }
@@ -58,9 +58,8 @@ ClassScanReport >> classReportViewIn: composite [
 	<gtInspectorPresentationOrder: -10>
 	<moosePresentationOrder: -20>
 	composite roassal2
-		title: 'NameBlueprint';
-		initializeView: [ self hierarchicalVisualisationWithCouleredSuffixes]
-
+		title: '33NameBlueprint';
+		initializeView: [ self hierarchicalVisualisationWithColeredSuffixes ]
 ]
 
 { #category : #queries }
@@ -146,7 +145,7 @@ ClassScanReport >> groupOfPackagesScanReport [
 ]
 
 { #category : #Visualisation }
-ClassScanReport >> hierarchicalVisualisationWithCouleredSuffixes [
+ClassScanReport >> hierarchicalVisualisationWithColeredSuffixes [
 	| b allHierarchyClasses allPackages aDico |
 	aDico := Dictionary new.
 	allHierarchyClasses := ((((self at: 'rootClass') allSubInheritances

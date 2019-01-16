@@ -22,8 +22,8 @@ FAMIXPackageGroup >> packageViewIn: composite [
 	<gtInspectorPresentationOrder: -10>
 	<moosePresentationOrder: -20>
 	composite roassal2
-		title: 'NameBlueprint';
-		initializeView: [ |view|
+		title: '66NameBlueprint';
+		initializeView: [ | view |
 			view := self vocabularyScanner classBluePrint.
 			self addClassBlueprintLegendOn: view view.
 			view ]

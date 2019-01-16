@@ -1,7 +1,7 @@
 Class {
 	#name : #PackageScanReport,
 	#superclass : #VocabularyScanReport,
-	#category : #'ClassNamesAnalyzer-Reports'
+	#category : #'ClassNamesAnalyzer-Core'
 }
 
 { #category : #'as yet unclassified' }

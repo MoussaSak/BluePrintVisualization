@@ -11,7 +11,7 @@ Class {
 		'dominantHierarchieInPackages',
 		'packagesWithClasses'
 	],
-	#category : #'ClassNamesAnalyzer-Reports'
+	#category : #'ClassNamesAnalyzer-Core'
 }
 
 { #category : #'as yet unclassified' }
@@ -64,7 +64,7 @@ SuffixScanReport >> dominantHierarchie [
 	^self dominantHierarchies first
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 SuffixScanReport >> dominantHierarchieInPackage: aFAMIXPackage [ 
 	^((self packagesWithClasses at: aFAMIXPackage) collect: [ :each | each at: 'rootClass' ]) asBag sortedCounts first value
 	
@@ -187,7 +187,7 @@ SuffixScanReport >> packages [
 	^ packages ifNil: [ packages := classScanReports collect: [ :each| each at: 'package' ] ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 SuffixScanReport >> packagesWithClasses [
 ^packagesWithClasses ifNil:[
 	|aDictionary|

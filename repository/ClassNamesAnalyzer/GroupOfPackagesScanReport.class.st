@@ -1,7 +1,7 @@
 Class {
 	#name : #GroupOfPackagesScanReport,
 	#superclass : #VocabularyScanReport,
-	#category : #'ClassNamesAnalyzer-Reports'
+	#category : #'ClassNamesAnalyzer-Core'
 }
 
 { #category : #accessing }

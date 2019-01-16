@@ -7,7 +7,7 @@ We just need to have class, package and inheritance.
 Class {
 	#name : #RunnableExamples,
 	#superclass : #Object,
-	#category : #'ClassNamesAnalyzer-Reports'
+	#category : #'ClassNamesAnalyzer-Tests'
 }
 
 { #category : #loading }

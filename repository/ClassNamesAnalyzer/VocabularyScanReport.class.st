@@ -5,7 +5,7 @@ Class {
 		'subEntityScanReports',
 		'scannedEntity'
 	],
-	#category : #'ClassNamesAnalyzer-Reports'
+	#category : #'ClassNamesAnalyzer-Core'
 }
 
 { #category : #accessing }
