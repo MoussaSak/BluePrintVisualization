@@ -10,8 +10,17 @@ Class {
 
 { #category : #accessing }
 VocabularyScanReport >> = aReport [
-	^ aReport ifNotNil: [scannedEntity = aReport scannedEntity]
-	ifNil:[false]
+	self flag: #tofix. "There is a problem in the model. There is a key that is not found in a dictionary or set."
+	aReport = 'KeyForNilObjects'
+		ifTrue: [ ^ false ].
+	^ aReport
+		ifNotNil: [ scannedEntity = aReport scannedEntity ]
+		ifNil: [ false ]
+]
+
+{ #category : #accessing }
+VocabularyScanReport >> hash [
+	^ scannedEntity hash
 ]
 
 { #category : #accessing }

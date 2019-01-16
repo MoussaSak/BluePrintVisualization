@@ -44,7 +44,7 @@ FAMIXClassScanner >> defaultMetrics [
 ]
 
 { #category : #VocabularyScanning }
-FAMIXClassScanner >> generateaClassNamesScanReport [
+FAMIXClassScanner >> generateClassNamesScanReport [
 	classNamesScanReport := ClassScanReport new.
 	classNamesScanReport scannedEntity: scannedEntities.
 	self definedMetrics associations do:[:each| classNamesScanReport at: each key ifAbsentPut: (each value value: self)].

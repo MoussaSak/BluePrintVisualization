@@ -4,7 +4,7 @@ Class {
 	#category : #'ClassNamesAnalyzer-Reports'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #loading }
 RunnableExamples class >> loadInMoose: aClassHierarchy [
 	| packages model importer HierarchyToAnalze |
 	HierarchyToAnalze := aClassHierarchy.

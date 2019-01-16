@@ -50,9 +50,11 @@ FAMIXClass >> scanClassNames [
 
 { #category : #'*ClassNamesAnalyzer' }
 FAMIXClass >> superclasses [
-	self isaRootClass 
-		ifTrue:[ ^ OrderedCollection with: self ]
-		ifFalse: [ ^self superclass superclasses add: self;yourself ]
+	 ^ self isaRootClass
+		ifTrue: [ OrderedCollection with: self ]
+		ifFalse: [ self superclass superclasses
+				add: self;
+				yourself ]
 ]
 
 { #category : #'*ClassNamesAnalyzer' }

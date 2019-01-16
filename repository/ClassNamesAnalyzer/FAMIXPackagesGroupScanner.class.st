@@ -264,7 +264,7 @@ FAMIXPackagesGroupScanner >> mergeSinglePackageScanReports: aCollectionOfPackage
 		deprecated: 'Use generateaClassNamesScanReport instead'
 		on: 	'27 April 2018' 
 		in: 'Pharo-5.0-50761-'.
-	^ self generateaClassNamesScanReport 
+	^ self generateClassNamesScanReport 
 ]
 
 { #category : #'instance-creation' }

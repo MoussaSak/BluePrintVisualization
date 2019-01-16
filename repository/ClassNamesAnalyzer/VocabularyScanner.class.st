@@ -23,13 +23,13 @@ VocabularyScanner class >> reportClass [
 VocabularyScanner class >> scan: aFAMIXPackageGroup [ 
 	|aVocabularyScanner|
 	
-	aVocabularyScanner := (self new scannedEntities: aFAMIXPackageGroup) generateaClassNamesScanReport;yourself.
+	aVocabularyScanner := (self new scannedEntities: aFAMIXPackageGroup) generateClassNamesScanReport;yourself.
 	aFAMIXPackageGroup vocabularyScanner: aVocabularyScanner.
 	^aVocabularyScanner
 ]
 
 { #category : #metrics }
-VocabularyScanner >> addaMetric: metricName with: aBlock [
+VocabularyScanner >> addMetric: metricName with: aBlock [
 	definedMetrics at: metricName put: aBlock
 	
 ]
@@ -58,7 +58,7 @@ VocabularyScanner >> allClassNameSuffixesSorted: suffixScanReports [
 
 ]
 
-{ #category : #Visualizations }
+{ #category : #visualisations }
 VocabularyScanner >> classBluePrint [
 		| b sortedRootClasses  delay |
 	^classNamesScanReport at: 'classBlueprint' ifAbsentPut:[ 	b := RTMondrian new.
@@ -143,9 +143,15 @@ b shape line color: (Color white alpha: 0.05).
 	]
 ]
 
-{ #category : #Accessing }
+{ #category : #accessing }
 VocabularyScanner >> classNamesScanReport [
 	^ classNamesScanReport
+]
+
+{ #category : #initialization }
+VocabularyScanner >> defaultMetrics [
+
+	self subclassResponsibility 
 ]
 
 { #category : #metrics }
@@ -160,14 +166,14 @@ VocabularyScanner >> definedMetrics [
 	
 ]
 
-{ #category : #'instance-creation' }
+{ #category : #utils }
 VocabularyScanner >> dictionaryOfColors [
 
 	^self scannedEntities mooseModel dictionaryOfRootClassColors
 ]
 
-{ #category : #VocabularyScanning }
-VocabularyScanner >> generateaClassNamesScanReport [
+{ #category : #'vocabulary scanning' }
+VocabularyScanner >> generateClassNamesScanReport [
 	| subEntityScanReports |
 	classNamesScanReport := self reportClass new.
 	classNamesScanReport scannedEntity: scannedEntities.
@@ -186,7 +192,7 @@ VocabularyScanner >> initialize [
 ]
 
 { #category : #metrics }
-VocabularyScanner >> removeaMetrics: metricName [
+VocabularyScanner >> removeMetrics: metricName [
 	definedMetrics removeKey: metricName ifAbsent: [  ]
 	
 ]
