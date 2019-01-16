@@ -191,21 +191,18 @@ AbstractClassNameAnalyser >> displayInheritanceRelationsOn: b [
 { #category : #'vocabulary scanning' }
 AbstractClassNameAnalyser >> generateClassNamesScanReport [
 	| subEntityScanReports |
-	
 	report := self reportClass new.
 	report scannedEntity: scannedEntities.
-	
 	subEntityScanReports := self computeReportsForSubEntities.
 	report subEntityScanReports: subEntityScanReports.
-	
-	"Here we compute the value of the state of the whole based on the subelement values"
-	self definedMetrics associations 
-		do: [ :each | 
-				report 
-					at: each key 
-					ifAbsentPut: (each value value: subEntityScanReports)].
-	^ report.
 
+	"Here we compute the value of the state of the whole based on the subelement values"
+	self definedMetrics associations
+		do: [ :each | 
+			report
+				at: each key
+				ifAbsentPut: [each value value: subEntityScanReports] ].
+	^ report
 ]
 
 { #category : #initialization }

@@ -181,8 +181,7 @@ FAMIXPackagesGroupAnalyser >> computeSuffixesGroupedByRootClassesFor: aGroupOfSc
 	aDictionary := Dictionary new.
 	^ (self classNamesScanReport
 		at: 'allClassesGroupedByRootClasses'
-		ifAbsentPut: [ (self defaultMetrics at: 'allClassesGroupedByRootClasses')
-				value: aGroupOfScanReports ]) associations
+		ifAbsentPut: [ (self defaultMetrics at: 'allClassesGroupedByRootClasses') value: aGroupOfScanReports ]) associations
 		collect: [ :association | 
 			association key
 				-> (association value collect: [ :aReport | aReport at: 'classSuffix' ]) ]

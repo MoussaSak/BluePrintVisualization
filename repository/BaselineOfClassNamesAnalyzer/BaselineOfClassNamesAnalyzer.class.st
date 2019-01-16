@@ -6,18 +6,24 @@ Class {
 
 { #category : #baselines }
 BaselineOfClassNamesAnalyzer >> baseline: spec [
-  <baseline>
-  spec
-    for: #common
-    do: [
-		"Packages"
-      spec
-        package: 'ClassNamesAnalyzer' with: [spec requires: #('ColorsExtensions' 'Moose')].
-  		spec
-    	baseline: 'ColorsExtensions'
-    	with: [ spec repository: 'github://pharo-contributions/ColorsExtensions:master/src' ] .
-		spec
-      	baseline: 'Moose'
-      	with: [ spec repository: 'github://moosetechnology/Moose:development/src' ].	
-     ]
+	<baseline>
+	spec
+		for: #common
+		do: [ "Packages"
+			spec
+				package: 'ClassNamesAnalyzer'
+				with: [ spec requires: #('ColorsExtensions' 'Moose') ].
+			spec
+				package: 'ClassNamesAnalyzerResourcesForTest'.
+			spec
+				package: 'ClassNamesAnalyzerTest'
+				with: [ spec requires: #('ClassNamesAnalyzer' 'ClassNamesAnalyzerResourcesForTest') ].
+				
+			spec
+				baseline: 'ColorsExtensions'
+				with: [ spec
+						repository: 'github://pharo-contributions/ColorsExtensions:master/src' ].
+			spec
+				baseline: 'Moose'
+				with: [ spec repository: 'github://moosetechnology/Moose:development/src' ] ]
 ]
