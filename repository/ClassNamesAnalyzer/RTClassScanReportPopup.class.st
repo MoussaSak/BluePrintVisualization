@@ -4,7 +4,7 @@ Class {
 	#category : #'ClassNamesAnalyzer-Visualization'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #hooks }
 RTClassScanReportPopup >> initializeElement: element [
 	super initializeElement: element.
 	element

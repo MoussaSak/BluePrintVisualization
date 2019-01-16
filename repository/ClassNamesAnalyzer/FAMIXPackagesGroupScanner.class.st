@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'availableColors'
 	],
-	#category : #ClassNamesAnalyzer
+	#category : #'ClassNamesAnalyzer-Core'
 }
 
 { #category : #'instance-creation' }
@@ -89,9 +89,112 @@ FAMIXPackagesGroupScanner >> allSuffixes [
 ]
 
 { #category : #'instance-creation' }
+FAMIXPackagesGroupScanner >> computeAllClassNameSuffixesSorted [
+	| suffixScanReports |
+	suffixScanReports := ((self classNamesScanReport subEntityScanReports
+		collect:
+			[ :aPackageScanReport | aPackageScanReport at: 'allClassNameSuffixesSorted' ])
+		flatCollect: #value) collect: #value.
+	^ self allClassNameSuffixesSorted: suffixScanReports
+]
+
+{ #category : #'instance-creation' }
+FAMIXPackagesGroupScanner >> computeAllClassesGroupedByRootClassesFor: aGroupOfScanReports [
+	| aDictionary |
+	aDictionary := Dictionary new.
+	(self classNamesScanReport
+		at: 'allRootClasses'
+		ifAbsentPut: [ (self defaultMetrics at: 'allRootClasses')
+				value: aGroupOfScanReports ])
+		do: [ :anAssociation | 
+			| root subClass |
+			root := anAssociation key.
+			subClass := anAssociation value.
+			aDictionary
+				at: root
+				ifPresent: [ (aDictionary at: root)
+						add: subClass;
+						yourself ]
+				ifAbsentPut: [ Bag with: subClass ] ].
+	^ aDictionary
+]
+
+{ #category : #'instance-creation' }
+FAMIXPackagesGroupScanner >> computeAllRootClassesAsSetFor: aGroupOfScanReports [
+	^ (self classNamesScanReport
+		at: 'allRootClassesSortedByNumberOfSubClasses'
+		ifAbsentPut: [ (self defaultMetrics at: 'allRootClassesSortedByNumberOfSubClasses')
+				value: aGroupOfScanReports ]) collect: #value
+]
+
+{ #category : #'instance-creation' }
+FAMIXPackagesGroupScanner >> computeColorsOfRootClassesFor: aGroupOfScanReports [
+	| i aDictionaryOfColors |
+	aDictionaryOfColors := self scannedEntities mooseModel
+		dictionaryOfRootClassColors
+		ifNil: [ aDictionaryOfColors := Dictionary new ].
+	i := aDictionaryOfColors size.
+	^ (self classNamesScanReport
+		at: 'allRootClassesSortedByNumberOfSubClasses'
+		ifAbsentPut: [ (self defaultMetrics at: 'allRootClassesSortedByNumberOfSubClasses')
+				value: aGroupOfScanReports ])
+		do: [ :aRootClass | 
+			aDictionaryOfColors
+				at: aRootClass
+				ifAbsent: [ aRootClass value isMetaRoot
+						ifTrue: [ aDictionaryOfColors at: aRootClass value put: (Color gray: 1) ]
+						ifFalse: [ aRootClass value vocabularyScanner classNamesScanReport
+								allSubclasses size > 1
+								ifTrue: [ aRootClass value vocabularyScanner classNamesScanReport
+										numberOfSuffixes = 1
+										ifTrue: [ aDictionaryOfColors at: aRootClass value put: Color gray ]
+										ifFalse: [ i := i + 1.
+											aDictionaryOfColors
+												at: aRootClass value
+												put: (self pickAnAvailableColorNumber: i) ] ]
+								ifFalse: [ aDictionaryOfColors at: aRootClass value put: Color white ] ].
+					self saveInMooseModel: aDictionaryOfColors ] ]
+]
+
+{ #category : #'instance-creation' }
+FAMIXPackagesGroupScanner >> computeDominantRootsInSuffixFor: aGroupOfScanReports [
+	^ ((self classNamesScanReport
+		at: 'hierarchiesGroupedBySuffixes'
+		ifAbsentPut: [ (self defaultMetrics at: 'hierarchiesGroupedBySuffixes')
+				value: aGroupOfScanReports ]) associations
+		collect: [ :association | association key -> association value sortedCounts ])
+		asDictionary
+]
+
+{ #category : #'instance-creation' }
+FAMIXPackagesGroupScanner >> computeHierarchiesGrouperBySuffixesFor: aGroupOfScanReports [
+	^ ((self classNamesScanReport
+		at: 'allClassNameSuffixesSorted'
+		ifAbsentPut: [ (self defaultMetrics at: 'allClassNameSuffixesSorted')
+				value: aGroupOfScanReports ])
+		collect:
+			[ :association | association value suffix -> association value hierarchies ])
+		asDictionary
+]
+
+{ #category : #'instance-creation' }
+FAMIXPackagesGroupScanner >> computeSuffixesGroupedByRootClassesFor: aGroupOfScanReports [
+	| aDictionary |
+	aDictionary := Dictionary new.
+	^ (self classNamesScanReport
+		at: 'allClassesGroupedByRootClasses'
+		ifAbsentPut: [ (self defaultMetrics at: 'allClassesGroupedByRootClasses')
+				value: aGroupOfScanReports ]) associations
+		collect: [ :association | 
+			association key
+				-> (association value collect: [ :aReport | aReport at: 'classSuffix' ]) ]
+]
+
+{ #category : #'instance-creation' }
 FAMIXPackagesGroupScanner >> defaultMetrics [
 	^ Dictionary new
-		at: 'numberOfPackages' put: [ :aGroupOfScanReports | aGroupOfScanReports size ];
+		at: 'numberOfPackages'
+			put: [ :aGroupOfScanReports | aGroupOfScanReports size ];
 		at: 'allClasses'
 			put: [ :aGroupOfScanReports | 
 			aGroupOfScanReports
@@ -102,24 +205,13 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 				flatCollect: [ :aPackageScanReport | aPackageScanReport at: 'classNames' ] ];
 		at: 'allRootClasses'
 			put: [ :aGroupOfScanReports | 
-				
 			aGroupOfScanReports
 				flatCollect: [ :aPackageScanReport | aPackageScanReport at: 'allRootClasses' ] ];
 		at: 'hierarchiesGroupedBySuffixes'
-			put: [ :aGroupOfScanReports | 
-			((self classNamesScanReport
-				at: 'allClassNameSuffixesSorted'
-				ifAbsentPut: [ (self defaultMetrics at: 'allClassNameSuffixesSorted') value: aGroupOfScanReports ])
-				collect: [ :association | association value suffix -> association value hierarchies ])
-				asDictionary ];
+			put:
+				[ :aGroupOfScanReports | self computeHierarchiesGrouperBySuffixesFor: aGroupOfScanReports ];
 		at: 'allClassNameSuffixesSorted'
 			put: [ :aGroupOfScanReports | 
-			| suffixScanReports |
-			suffixScanReports := ((self classNamesScanReport subEntityScanReports
-				collect: [ :aPackageScanReport | aPackageScanReport at: 'allClassNameSuffixesSorted' ])
-				flatCollect: #value) collect: #value.
-			self allClassNameSuffixesSorted: suffixScanReports
-
 			"|aDictionary|
 			aDictionary := Dictionary new.
 (self classNamesScanReport at: 'allRootClasses' ifAbsentPut: [(self defaultMetrics at:'allRootClasses') value: aGroupOfScanReports]) collect: [:association|
@@ -127,78 +219,29 @@ FAMIXPackagesGroupScanner >> defaultMetrics [
 	suffix := association value at: 'classSuffix'.
 	rootClass := association key.
 	aDictionary at: suffix ifPresent: [(aDictionary at: suffix) add: rootClass ] ifAbsentPut: [Bag with: rootClass] ].
-	aDictionary" ];
+	aDictionary"
+			self computeAllClassNameSuffixesSorted ];
 		at: 'dominantRootsInSuffix'
-			put: [ :aGroupOfScanReports | 
-			((self classNamesScanReport
-				at: 'hierarchiesGroupedBySuffixes'
-				ifAbsentPut: [ (self defaultMetrics at: 'hierarchiesGroupedBySuffixes') value: aGroupOfScanReports ])
-				associations
-				collect: [ :association | association key -> association value sortedCounts ])
-				asDictionary ];
+			put:
+				[ :aGroupOfScanReports | self computeDominantRootsInSuffixFor: aGroupOfScanReports ];
 		at: 'suffixesGroupedByRootClasses'
-			put: [ :aGroupOfScanReports | 
-			| aDictionary |
-			aDictionary := Dictionary new.
-			(self classNamesScanReport
-				at: 'allClassesGroupedByRootClasses'
-				ifAbsentPut: [ (self defaultMetrics at: 'allClassesGroupedByRootClasses') value: aGroupOfScanReports ])
-				associations
-				collect:
-					[ :association | association key -> (association value collect: [ :aReport | aReport at: 'classSuffix' ]) ] ];
+			put:
+				[ :aGroupOfScanReports | self computeSuffixesGroupedByRootClassesFor: aGroupOfScanReports ];
 		at: 'allClassesGroupedByRootClasses'
-			put: [ :aGroupOfScanReports | 
-			| aDictionary |
-			aDictionary := Dictionary new.
-			(self classNamesScanReport
-				at: 'allRootClasses'
-				ifAbsentPut: [ (self defaultMetrics at: 'allRootClasses') value: aGroupOfScanReports ])
-				do: [ :anAssociation | 
-					| root subClass |
-					root := anAssociation key.
-					subClass := anAssociation value.
-					aDictionary
-						at: root
-						ifPresent: [ (aDictionary at: root)
-								add: subClass;
-								yourself ]
-						ifAbsentPut: [ Bag with: subClass ] ].
-			aDictionary ];
+			put:
+				[ :aGroupOfScanReports | self computeAllClassesGroupedByRootClassesFor: aGroupOfScanReports ];
 		at: 'allRootClassesSortedByNumberOfSubClasses'
 			put: [ :aGroupOfScanReports | 
 			((self classNamesScanReport
 				at: 'allRootClasses'
-				ifAbsentPut: [ (self defaultMetrics at: 'allRootClasses') value: aGroupOfScanReports ])
-				collect: #key) asBag sortedCounts ];
+				ifAbsentPut: [ (self defaultMetrics at: 'allRootClasses')
+						value: aGroupOfScanReports ]) collect: #key) asBag sortedCounts ];
 		at: 'allRootClassesAsaSet'
-			put: [ :aGroupOfScanReports | 
-			(self classNamesScanReport
-				at: 'allRootClassesSortedByNumberOfSubClasses'
-				ifAbsentPut: [ (self defaultMetrics at: 'allRootClassesSortedByNumberOfSubClasses')
-						value: aGroupOfScanReports ]) collect: #value ];
+			put:
+				[ :aGroupOfScanReports | self computeAllRootClassesAsSetFor: aGroupOfScanReports ];
 		at: 'colorsOfRootClasses'
-			put: [ :aGroupOfScanReports | 
-				| aDictionaryOfColors i |
-			aDictionaryOfColors := self scannedEntities mooseModel dictionaryOfRootClassColors
-				ifNil: [ 
-					aDictionaryOfColors := Dictionary new].
-				i := aDictionaryOfColors size.
-					
-					(self classNamesScanReport
-						at: 'allRootClassesSortedByNumberOfSubClasses'
-						ifAbsentPut: [ (self defaultMetrics at: 'allRootClassesSortedByNumberOfSubClasses')
-								value: aGroupOfScanReports ])
-						do: [ :aRootClass | 
-							aDictionaryOfColors at: aRootClass ifAbsent: [
-							aRootClass value isMetaRoot
-								ifTrue: [ aDictionaryOfColors at: aRootClass value put: (Color gray: 1) ]
-								ifFalse: [ aRootClass value vocabularyScanner classNamesScanReport allSubclasses size > 1
-										ifTrue: [ aRootClass value vocabularyScanner classNamesScanReport numberOfSuffixes = 1 ifTrue:[ aDictionaryOfColors at: aRootClass value put: Color gray ] ifFalse:[i := i + 1.
-											aDictionaryOfColors
-												at: aRootClass value
-												put: (self pickAnAvailableColorNumber: i)] ]
-										ifFalse: [ aDictionaryOfColors at: aRootClass value put: Color white ] ].
-							self saveInMooseModel: aDictionaryOfColors ] ] ];
+			put:
+				[ :aGroupOfScanReports | self computeColorsOfRootClassesFor: aGroupOfScanReports ];
 		yourself
 ]
 
@@ -256,15 +299,6 @@ FAMIXPackagesGroupScanner >> groupOfPackagesScanReport [
 FAMIXPackagesGroupScanner >> initialize [
 	super initialize.
 	availableColors := self class allColors
-]
-
-{ #category : #VocabularyScanning }
-FAMIXPackagesGroupScanner >> mergeSinglePackageScanReports: aCollectionOfPackageScanReports [ 
-	self 
-		deprecated: 'Use generateaClassNamesScanReport instead'
-		on: 	'27 April 2018' 
-		in: 'Pharo-5.0-50761-'.
-	^ self generateClassNamesScanReport 
 ]
 
 { #category : #'instance-creation' }

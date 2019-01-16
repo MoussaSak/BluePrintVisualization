@@ -1,7 +1,7 @@
 Class {
 	#name : #FAMIXPackageScanner,
 	#superclass : #VocabularyScanner,
-	#category : #ClassNamesAnalyzer
+	#category : #'ClassNamesAnalyzer-Core'
 }
 
 { #category : #'as yet unclassified' }

@@ -1,3 +1,9 @@
+"
+I'm a little script to create a model without all the unnecessary information. 
+We just need to have class, package and inheritance. 
+
+	RunnableExamples loadInMooseHierarchyOf: ComposablePresenter
+"
 Class {
 	#name : #RunnableExamples,
 	#superclass : #Object,
@@ -5,11 +11,12 @@ Class {
 }
 
 { #category : #loading }
-RunnableExamples class >> loadInMoose: aClassHierarchy [
-	| packages model importer HierarchyToAnalze |
-	HierarchyToAnalze := aClassHierarchy.
+RunnableExamples class >> loadInMooseHierarchyOf: aClass [
+	| packages model importer hierarchyToAnalyze |
+	hierarchyToAnalyze := aClass.
 	model := MooseModel new.
 	importer := MoosePharoImporterTask new model: model.
+	importer factory: SmalltalkCompatibilityMetamodelFactory.
 	importer
 		importingContext:
 			(MooseImportingContext new
@@ -18,9 +25,11 @@ RunnableExamples class >> loadInMoose: aClassHierarchy [
 				importPackage;
 				importInheritance;
 				yourself).
-	packages := HierarchyToAnalze allSubclasses collect: [ :each | each package name ] as: Set.
+	packages := hierarchyToAnalyze allSubclasses
+		collect: [ :each | each package name ]
+		as: Set.
 	packages do: [ :each | importer addFromPackageNamed: each ].
 	importer run.
-	model name: HierarchyToAnalze name.
+	model name: hierarchyToAnalyze name.
 	^ model install
 ]

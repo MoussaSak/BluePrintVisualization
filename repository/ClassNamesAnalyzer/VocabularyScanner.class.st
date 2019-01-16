@@ -6,7 +6,7 @@ Class {
 		'scannedEntities',
 		'definedMetrics'
 	],
-	#category : #ClassNamesAnalyzer
+	#category : #'ClassNamesAnalyzer-Core'
 }
 
 { #category : #'as yet unclassified' }
@@ -60,87 +60,103 @@ VocabularyScanner >> allClassNameSuffixesSorted: suffixScanReports [
 
 { #category : #visualisations }
 VocabularyScanner >> classBluePrint [
-		| b sortedRootClasses  delay |
-	^classNamesScanReport at: 'classBlueprint' ifAbsentPut:[ 	b := RTMondrian new.
-			delay:=Time now.
-	"TimeProfiler spyOn:["sortedRootClasses := (self classNamesScanReport
-		at: 'allRootClassesSortedByNumberOfSubClasses') collect: #value.
-	"dictionaryOfColors := self classNamesScanReport
+	| b  delay |
+	^ classNamesScanReport
+		at: 'classBlueprint'
+		ifAbsentPut: [ 
+			| sortedRootClasses |
+			b := RTMondrian new.
+			delay := Time now.
+			"TimeProfiler spyOn:["
+			sortedRootClasses := (self classNamesScanReport
+				at: 'allRootClassesSortedByNumberOfSubClasses') collect: #value.
+			"dictionaryOfColors := self classNamesScanReport
 		at: 'colorsOfRootClasses'."
-	b shape rectangle withTextAbove.
-"	b shape color: [ :each| Color white ];
+			b shape rectangle withTextAbove.
+			"	b shape color: [ :each| Color white ];
 	borderColor: [ :aPackage| Color gray ] .
-"	b
-		nodes: self scannedPackages
-		forEach: [ :aSinglePackage | 
-			| aSinglePackageScanReport sortedSuffixes unSortedSuffixes |
-			aSinglePackageScanReport := aSinglePackage vocabularyScanner
-				classNamesScanReport.
-			b shape rectangle.
-			b shape
-				color: [ :aSuffix | 
-					| dominantClasse |
-					dominantClasse := ((self groupOfPackagesScanReport
-						at: 'dominantRootsInSuffix') at: aSuffix value suffix) first value.
-						"if DictionaryOfColors is nil this means that the group of packages has not been scanned yet. Then scan it"
-						self dictionaryOfColors ifNil:[
-							self scannedEntities mooseModel allPackages scanClassNames
-							].
-						.
-						
-					(self dictionaryOfColors at: dominantClasse) adjustGray: aSuffix hierarchies asSet size"alpha: ((aSuffix value dominantHierarchieInPackages select: [ :each| each value >= aSuffix value dominanceLevel ]) size / aSuffix value dominantHierarchieInPackages size)" ];
-				withTextAbove: [:each| each value suffix];
-				borderWidth: 2.
-							b shape borderColor: [  :aSuffix | 
-					| dominantClasse |
-					dominantClasse := ((self groupOfPackagesScanReport
-						at: 'dominantRootsInSuffix') at: aSuffix value suffix) first value.
-					(self dictionaryOfColors at: dominantClasse)  ] .
-unSortedSuffixes := (self groupOfPackagesScanReport at: 'allClassNameSuffixesSorted') select: [ :association| association value packages includes: aSinglePackageScanReport scannedEntity ]  .
-"sortedSuffixes := sortedSuffixes sort: [ :first :second | (first value dominantHierarchie key first = second value dominantHierarchie key first) and: ].
 "
-sortedSuffixes := aSinglePackageScanReport sortSuffixes: unSortedSuffixes.
 			b
-				nodes: sortedSuffixes
-				forEach: [ :suffix | 
-					
+				nodes: self scannedPackages
+				forEach: [ :aSinglePackage | 
+					| aSinglePackageScanReport sortedSuffixes unSortedSuffixes |
+					aSinglePackageScanReport := aSinglePackage vocabularyScanner
+						classNamesScanReport.
 					b shape rectangle.
 					b shape
-						size:
-							[ :aClassScanReport | 50 / ((aClassScanReport at: 'superclassesInCurrentPackage') size + 1) ].
+						color: [ :aSuffix | 
+							| dominantClasse |
+							dominantClasse := ((self groupOfPackagesScanReport
+								at: 'dominantRootsInSuffix') at: aSuffix value suffix) first
+								value.
+							"if DictionaryOfColors is nil this means that the group of packages has not been scanned yet. Then scan it"
+							self dictionaryOfColors
+								ifNil:
+									[ self scannedEntities mooseModel allPackages scanClassNames ].
+							(self dictionaryOfColors at: dominantClasse)
+								adjustGray: aSuffix hierarchies asSet size	"alpha: ((aSuffix value dominantHierarchieInPackages select: [ :each| each value >= aSuffix value dominanceLevel ]) size / aSuffix value dominantHierarchieInPackages size)" ];
+						withTextAbove: [ :each | each value suffix ];
+						borderWidth: 2.
 					b shape
-						color: [ :aClassScanReport | 
-							 self dictionaryOfColors at: (aClassScanReport at: 'rootClass')  ];
-						borderColor: [ :aClassScanReport | 
-							(aClassScanReport at: 'className')
-								= (aClassScanReport at: 'rootClass') name
-								ifTrue: [ Color black ]
-								ifFalse: [ (self dictionaryOfColors at: (aClassScanReport at: 'rootClass'))
-										adjustBrightness: -0.1 ] ];
-						borderWidth: 1.
+						borderColor: [ :aSuffix | 
+							| dominantClasse |
+							dominantClasse := ((self groupOfPackagesScanReport
+								at: 'dominantRootsInSuffix') at: aSuffix value suffix) first
+								value.
+							self dictionaryOfColors at: dominantClasse ].
+					unSortedSuffixes := (self groupOfPackagesScanReport
+						at: 'allClassNameSuffixesSorted')
+						select: [ :association | 
+							association value packages
+								includes: aSinglePackageScanReport scannedEntity ].
+					"sortedSuffixes := sortedSuffixes sort: [ :first :second | (first value dominantHierarchie key first = second value dominantHierarchie key first) and: ].
+"
+					sortedSuffixes := aSinglePackageScanReport
+						sortSuffixes: unSortedSuffixes.
 					b
-						nodes:
-							((aSinglePackageScanReport at: 'classesGroupedBySuffixes')
-								at: suffix value suffix).
-								
-					
+						nodes: sortedSuffixes
+						forEach: [ :suffix | 
+							b shape rectangle.
+							b shape
+								size:
+									[ :aClassScanReport | 50 / ((aClassScanReport at: 'superclassesInCurrentPackage') size + 1) ].
+							b shape
+								color:
+										[ :aClassScanReport | self dictionaryOfColors at: (aClassScanReport at: 'rootClass') ];
+								borderColor: [ :aClassScanReport | 
+									(aClassScanReport at: 'className')
+										= (aClassScanReport at: 'rootClass') name
+										ifTrue: [ Color black ]
+										ifFalse: [ (self dictionaryOfColors at: (aClassScanReport at: 'rootClass'))
+												adjustBrightness: -0.1 ] ];
+								borderWidth: 1.
+							b
+								nodes:
+									((aSinglePackageScanReport at: 'classesGroupedBySuffixes')
+										at: suffix value suffix).
+							b layout grid ].
 					b layout grid ].
-			b layout grid ].
-	b layout grid.
-	
-	
-	b view elements do: [ :element| element announcer subscriptions  subscriptions do: [ :each | element announcer subscriptions  subscriptions remove: each ]].
-	"b view elements do: [ :element| element @ (element model mouseAnnouncer)]".
-
-b shape line color: (Color white alpha: 0.05).
-	b edges: ((self classNamesScanReport at:'allClasses') collect: [ :each| 
-								each vocabularyScanner classNamesScanReport ]) from: #yourself to: [ :aClassScanReport| (aClassScanReport at: 'superclasse') ifNotNil: [ (aClassScanReport at: 'superclasse') vocabularyScanner classNamesScanReport ] ]."]"
-	
-	Transcript show: (Time now asSeconds - delay asSeconds )asString;cr.
-	
-	
-	^ b
-	]
+			b layout grid.
+			b view elements
+				do: [ :element | 
+					element announcer subscriptions subscriptions
+						do:
+							[ :each | element announcer subscriptions subscriptions remove: each ] ].
+			"b view elements do: [ :element| element @ (element model mouseAnnouncer)]"
+			b shape line color: (Color white alpha: 0.05).
+			b
+				edges:
+					((self classNamesScanReport at: 'allClasses')
+						collect: [ :each | each vocabularyScanner classNamesScanReport ])
+				from: #yourself
+				to: [ :aClassScanReport | 
+					(aClassScanReport at: 'superclasse')
+						ifNotNil: [ (aClassScanReport at: 'superclasse') vocabularyScanner
+								classNamesScanReport ] ].	"]"
+			Transcript
+				show: (Time now asSeconds - delay asSeconds) asString;
+				cr.
+			^ b ]
 ]
 
 { #category : #accessing }
@@ -150,26 +166,25 @@ VocabularyScanner >> classNamesScanReport [
 
 { #category : #initialization }
 VocabularyScanner >> defaultMetrics [
-
-	self subclassResponsibility 
+	^ self subclassResponsibility 
 ]
 
 { #category : #metrics }
 VocabularyScanner >> definedMetricNames [
-	^definedMetrics allKeys
+	^ definedMetrics allKeys
 	
 ]
 
 { #category : #metrics }
 VocabularyScanner >> definedMetrics [
-	^definedMetrics
+	^ definedMetrics
 	
 ]
 
 { #category : #utils }
 VocabularyScanner >> dictionaryOfColors [
 
-	^self scannedEntities mooseModel dictionaryOfRootClassColors
+	^ self scannedEntities mooseModel dictionaryOfRootClassColors
 ]
 
 { #category : #'vocabulary scanning' }

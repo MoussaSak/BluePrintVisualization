@@ -1,7 +1,7 @@
 Class {
 	#name : #FAMIXStPackageScanner,
 	#superclass : #VocabularyScanner,
-	#category : #ClassNamesAnalyzer
+	#category : #'ClassNamesAnalyzer-Core'
 }
 
 { #category : #'instance-creation' }

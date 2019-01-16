@@ -1,15 +1,15 @@
 Class {
 	#name : #FAMIXClassScanner,
 	#superclass : #VocabularyScanner,
-	#category : #ClassNamesAnalyzer
+	#category : #'ClassNamesAnalyzer-Core'
 }
 
-{ #category : #'*ClassNamesAnalyzer' }
+{ #category : #'as yet unclassified' }
 FAMIXClassScanner class >> reportClass [
 	^ClassScanReport
 ]
 
-{ #category : #'*ClassNamesAnalyzer' }
+{ #category : #'as yet unclassified' }
 FAMIXClassScanner >> defaultMetrics [
 	"use 'aFAMIXClassScanner classNamesScanReport' whenever an expensive computation is required and has been computed in a previous metric
 	Example : rootClass uses the metric superclasses"
