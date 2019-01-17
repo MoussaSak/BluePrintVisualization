@@ -22,13 +22,13 @@ ClassNameAnalyserTest >> testFirst [
 	packages do: [ :each | importer addFromPackageNamed: each ].
 	importer run.
 	model name: 'ClassNamesAnalyzerResourcesForTest'.
-	model install.
 
 	self assert: model allModelPackages first class equals: FAMIXPackage.
-
-	self assert: model allModelPackages first vocabularyScanner class equals: FAMIXPackageAnalyser.
+	self
+		assert: model allModelPackages first vocabularyScanner class
+		equals: FAMIXPackageAnalyser.
 	"we should have a model in the future with more than one package so that we can test the FAMIXPackageGroupAnalyser"
-	
-	
-	self assert: model allModelPackages first vocabularyScanner scannedEntities equals: model allModelPackages first
+	self
+		assert: model allModelPackages first vocabularyScanner scannedEntities
+		equals: model allModelPackages first
 ]
