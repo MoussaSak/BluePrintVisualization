@@ -1,7 +1,7 @@
 Class {
 	#name : #ClassNameAnalyserTest,
 	#superclass : #TestCase,
-	#category : #ClassNamesAnalyserTest
+	#category : #ClassNamesAnalyzerTest
 }
 
 { #category : #tests }
